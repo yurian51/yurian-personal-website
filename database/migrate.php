@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/../config/bootstrap.php';
+if ((getenv('APP_ENV') ?: 'production') !== 'production') ini_set('display_errors','1');
 $pdo=db();
 $pdo->exec("CREATE TABLE IF NOT EXISTS schema_migrations (version VARCHAR(120) PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW())");
 $files=glob(__DIR__.'/migrations/*.sql'); sort($files);
