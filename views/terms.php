@@ -1,0 +1,1 @@
+<main class="container section"><div class="section-head"><span class="number">07 / LEGAL</span><h2>Terms.</h2></div><p class="intro">Use of this website is subject to applicable law. Content is provided for general informational purposes and may change as the site evolves.</p></main>
