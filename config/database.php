@@ -30,7 +30,10 @@ function db(): PDO
     $name = getenv('DB_NAME');
     $user = getenv('DB_USER');
     $pass = getenv('DB_PASSWORD');
-    if (!$host || !$name || !$user) throw new RuntimeException('Database configuration is missing.');
+    if (!$host || !$name || !$user) {
+        error_log('[database] no runtime database environment variables available');
+        throw new RuntimeException('Database configuration is missing.');
+    }
     return $pdo = new PDO(
         sprintf('pgsql:host=%s;port=%s;dbname=%s;sslmode=require', $host, getenv('DB_PORT') ?: '5432', $name),
         $user, $pass ?: '',
