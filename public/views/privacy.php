@@ -1,0 +1,1 @@
+<main><section class="section"><div class="section__heading"><span>01</span><h2>Privacy</h2></div><div class="glass-panel"><p>This site only processes information necessary to provide its services and respond to contact requests. No sensitive secrets belong in the repository.</p></div></section></main>
