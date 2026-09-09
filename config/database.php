@@ -7,6 +7,8 @@ function db(): PDO
     if ($pdo instanceof PDO) return $pdo;
 
     $url = trim((string) getenv('DATABASE_URL'));
+    $url = trim($url, " \\t\\r\\n\\\"");
+    if (str_starts_with($url, 'postgres://')) $url = 'postgresql://' . substr($url, 11);
 
     if ($url !== '') {
         $parts = parse_url($url);
