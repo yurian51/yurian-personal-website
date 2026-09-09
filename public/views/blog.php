@@ -1,0 +1,1 @@
+<main><section class="section"><div class="section__heading"><span>01</span><h2>Blog</h2></div><div class="glass-panel"><p class="hero__lead">Technical writing, product lessons and ideas from the build process.</p><p>Articles will be managed from the CMS.</p></div></section></main>
