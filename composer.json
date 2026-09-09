@@ -1,0 +1,6 @@
+{
+  "name": "yurian/personal-website",
+  "description": "Yurian personal website",
+  "type": "project",
+  "require": { "php": ">=8.3" }
+}
