@@ -1,0 +1,1 @@
+<main class="container section"><div class="section-head"><span class="number">06 / LEGAL</span><h2>Privacy.</h2></div><p class="intro">This page describes how information submitted through this website is handled. Only information needed to respond to enquiries or operate the site should be collected.</p></main>
