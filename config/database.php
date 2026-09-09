@@ -6,24 +6,61 @@ function db(): PDO
     static $pdo = null;
     if ($pdo instanceof PDO) return $pdo;
 
-    $url = getenv('DATABASE_URL');
-    if ($url) {
+    $url = trim((string) getenv('DATABASE_URL'));
+
+    if ($url !== '') {
         $parts = parse_url($url);
-        if ($parts === false || empty($parts['host']) || empty($parts['user']) || empty($parts['path'])) throw new RuntimeException('Invalid DATABASE_URL.');
-        $dsn = sprintf('pgsql:host=%s;port=%s;dbname=%s;sslmode=require', $parts['host'], $parts['port'] ?? 5432, ltrim($parts['path'], '/'));
-        $pdo = new PDO($dsn, urldecode($parts['user']), isset($parts['pass']) ? urldecode($parts['pass']) : '');
-    } else {
-        $host = getenv('DB_HOST');
-        $name = getenv('DB_NAME');
-        $user = getenv('DB_USER');
-        $pass = getenv('DB_PASSWORD');
-        if (!$host || !$name || !$user) {
-            throw new RuntimeException('Database is not configured. Set DATABASE_URL or DB_HOST/DB_NAME/DB_USER/DB_PASSWORD.');
+        if ($parts === false || empty($parts['host']) || empty($parts['path'])) {
+            if (!preg_match('~^postgres(?:ql)?://(?:(.*?):(.*?)@)?([^:/?#]+)(?::(\\d+))?/([^?]+)~', $url, $m)) {
+                throw new RuntimeException('Invalid DATABASE_URL format.');
+            }
+            $parts = [
+                'host' => $m[3],
+                'port' => $m[4] ?? 5432,
+                'path' => '/' . $m[5],
+                'user' => $m[1] ?? '',
+                'pass' => $m[2] ?? '',
+            ];
         }
-        $dsn = sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, getenv('DB_PORT') ?: '5432', $name);
-        $pdo = new PDO($dsn, $user, $pass ?: '');
+
+        $host = $parts['host'];
+        $port = $parts['port'] ?? 5432;
+        $name = ltrim((string) $parts['path'], '/');
+        $user = isset($parts['user']) ? urldecode((string) $parts['user']) : '';
+        $pass = isset($parts['pass']) ? urldecode((string) $parts['pass']) : '';
+
+        if ($user === '' || $name === '') {
+            throw new RuntimeException('DATABASE_URL is missing database credentials.');
+        }
+
+        $dsn = sprintf(
+            'pgsql:host=%s;port=%s;dbname=%s;sslmode=require',
+            $host,
+            $port,
+            urldecode($name)
+        );
+        $pdo = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_TIMEOUT => 10,
+        ]);
+        return $pdo;
     }
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+    $host = getenv('DB_HOST');
+    $name = getenv('DB_NAME');
+    $user = getenv('DB_USER');
+    $pass = getenv('DB_PASSWORD');
+
+    if (!$host || !$name || !$user) {
+        throw new RuntimeException('Database is not configured. Set DATABASE_URL or DB_HOST/DB_NAME/DB_USER/DB_PASSWORD.');
+    }
+
+    $dsn = sprintf('pgsql:host=%s;port=%s;dbname=%s;sslmode=require', $host, getenv('DB_PORT') ?: '5432', $name);
+    $pdo = new PDO($dsn, $user, $pass ?: '', [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_TIMEOUT => 10,
+    ]);
     return $pdo;
 }
