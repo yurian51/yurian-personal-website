@@ -8,7 +8,7 @@ function db(): PDO
 
     $url = getenv('DATABASE_URL');
     if ($url) {
-        $pdo = new PDO($url);
+        $pdo = new PDO($url, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     } else {
         $host = getenv('DB_HOST');
         $name = getenv('DB_NAME');
