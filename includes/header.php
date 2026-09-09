@@ -3,17 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Yurian, software engineer and product builder in Tanzania. Web applications, business systems, automation and digital products.">
-<meta name="theme-color" content="#0b0d0f">
-<title><?= e($pageTitle ?? 'Yurian') ?></title>
+<meta name="description" content="YURIAN // DIGITAL HQ — Arshad Yurian Mwangi. Building systems for what comes next.">
+<meta name="theme-color" content="#0d0d0b">
+<meta property="og:type" content="website">
+<meta property="og:title" content="<?= e($pageTitle ?? 'YURIAN // DIGITAL HQ') ?>">
+<meta property="og:description" content="Software engineer, AI builder, technology entrepreneur, and creator.">
+<meta property="og:url" content="<?= e(url($_SERVER['REQUEST_URI'] ?? '/')) ?>">
+<meta name="twitter:card" content="summary_large_image">
+<title><?= e($pageTitle ?? 'YURIAN // DIGITAL HQ') ?></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/app.css">
 <link rel="stylesheet" href="/assets/css/forms.css">
 </head>
 <body>
 <div class="site-shell">
-<header class="navbar">
-<a class="brand" href="/">YURIAN<span>.</span></a>
-<nav aria-label="Primary">
-<a href="/about">About</a><a href="/projects">Projects</a><a href="/services">Services</a><a href="/blog">Notes</a><a href="/contact">Contact</a>
-</nav>
+<header class="navbar" id="site-nav">
+<a class="brand" href="/" aria-label="YURIAN Digital HQ home"><span class="brand-mark">Y</span><span>YURIAN <b>//</b> DIGITAL HQ</span></a>
+<nav aria-label="Primary"><a href="/#identity">01 Identity</a><a href="/#build">02 Build</a><a href="/#projects">03 Work</a><a href="/#lab">04 Lab</a><a href="/blog">05 Notes</a><a href="/contact">06 Contact</a></nav>
+<button class="nav-menu" type="button" data-command-open aria-label="Open command palette">⌘K</button>
 </header>

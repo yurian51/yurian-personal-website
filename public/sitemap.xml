@@ -1,1 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>/</loc></url><url><loc>/about</loc></url><url><loc>/projects</loc></url><url><loc>/services</loc></url><url><loc>/blog</loc></url><url><loc>/contact</loc></url></urlset>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://yurian.dev/</loc></url>
+  <url><loc>https://yurian.dev/about</loc></url>
+  <url><loc>https://yurian.dev/projects</loc></url>
+  <url><loc>https://yurian.dev/services</loc></url>
+  <url><loc>https://yurian.dev/blog</loc></url>
+  <url><loc>https://yurian.dev/contact</loc></url>
+  <url><loc>https://yurian.dev/privacy</loc></url>
+  <url><loc>https://yurian.dev/terms</loc></url>
+</urlset>
