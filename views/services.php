@@ -1,0 +1,1 @@
+<?php $items=services(12); ?><main class="container section"><div class="section-head"><span class="number">02 / SERVICES</span><h2>What I can build.</h2></div><div class="notes"><?php foreach($items as $item): ?><article class="note"><h3><?=e($item['name']??'Service')?></h3><p><?=e($item['summary']??'')?></p></article><?php endforeach;?></div></main>
