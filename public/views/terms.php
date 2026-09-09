@@ -1,0 +1,1 @@
+<main><section class="section"><div class="section__heading"><span>01</span><h2>Terms</h2></div><div class="glass-panel"><p>Content on this website is provided for informational and portfolio purposes. Project trademarks and third-party materials remain the property of their respective owners.</p></div></section></main>
