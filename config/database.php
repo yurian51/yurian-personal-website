@@ -8,7 +8,10 @@ function db(): PDO
 
     $url = getenv('DATABASE_URL');
     if ($url) {
-        $pdo = new PDO($url, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $parts = parse_url($url);
+        if ($parts === false || empty($parts['host']) || empty($parts['user']) || empty($parts['path'])) throw new RuntimeException('Invalid DATABASE_URL.');
+        $dsn = sprintf('pgsql:host=%s;port=%s;dbname=%s;sslmode=require', $parts['host'], $parts['port'] ?? 5432, ltrim($parts['path'], '/'));
+        $pdo = new PDO($dsn, urldecode($parts['user']), isset($parts['pass']) ? urldecode($parts['pass']) : '');
     } else {
         $host = getenv('DB_HOST');
         $name = getenv('DB_NAME');
