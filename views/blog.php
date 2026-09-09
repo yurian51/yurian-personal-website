@@ -1,0 +1,1 @@
+<main class="container section"><div class="section-head"><span class="number">05 / NOTES</span><h2>Writing and notes.</h2></div><p class="intro">A place for practical notes about software, products, systems and things learned while building them.</p></main>
