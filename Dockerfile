@@ -10,7 +10,7 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 RUN mkdir -p storage/uploads storage/logs \
-    && chown -R www-data:www-data storage
+    && chown -R www-data:www-data storage \
     && chmod +x docker/entrypoint.sh
 
 COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
