@@ -8,5 +8,5 @@ try {
     echo json_encode(['status'=>'ok','service'=>'yurian-personal-website','database'=>'ok','php'=>PHP_VERSION], JSON_UNESCAPED_SLASHES);
 } catch (Throwable $e) {
     http_response_code(503);
-    echo json_encode(['status'=>'degraded','service'=>'yurian-personal-website','database'=>'unavailable'], JSON_UNESCAPED_SLASHES);
+    echo json_encode(['status'=>'degraded','service'=>'yurian-personal-website','database'=>'not-configured-or-unavailable'], JSON_UNESCAPED_SLASHES);
 }
