@@ -1,3 +1,4 @@
+CREATE TABLE IF NOT EXISTS schema_migrations (version VARCHAR(120) PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE INDEX IF NOT EXISTS idx_projects_published_featured ON projects(published,featured,sort_order);
 CREATE INDEX IF NOT EXISTS idx_messages_status_created ON messages(status,created_at DESC);
 CREATE TABLE IF NOT EXISTS experiences (id BIGSERIAL PRIMARY KEY,role VARCHAR(180) NOT NULL,company VARCHAR(180),location VARCHAR(180),start_date DATE,end_date DATE,current_role BOOLEAN NOT NULL DEFAULT FALSE,summary TEXT NOT NULL,sort_order INT NOT NULL DEFAULT 0);
