@@ -1,0 +1,1 @@
+<main><section class="section"><div class="section__heading"><span>01</span><h2>Services</h2></div><div class="card-grid"><?php foreach(services(50) as $service): ?><article class="card"><span class="card__meta">CAPABILITY</span><h3><?= e($service['name']) ?></h3><p><?= e($service['summary']) ?></p></article><?php endforeach; ?></div></section></main>
