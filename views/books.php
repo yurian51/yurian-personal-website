@@ -5,7 +5,7 @@
   <div class="store-grid">
     <?php foreach ($catalog as $book): ?>
       <article class="store-card">
-        <div class="store-cover" aria-hidden="true"><span><?= e(strtoupper(substr((string)$book['title'], 0, 1))) ?></span><small>YURIAN<br>PRESS</small></div>
+        <div class="store-cover" aria-hidden="true"><?php if (!empty($book['cover_url'])): ?><img src="<?= e($book['cover_url']) ?>" alt="" loading="lazy"><?php else: ?><span><?= e(strtoupper(substr((string)$book['title'], 0, 1))) ?></span><small>YURIAN<br>PRESS</small><?php endif; ?></div>
         <div class="store-card__body">
           <span class="mono-label">BOOK / <?= e(strtoupper($book['currency'] ?? 'USD')) ?></span>
           <h2><?= e($book['title']) ?></h2>

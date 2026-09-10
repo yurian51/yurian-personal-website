@@ -105,3 +105,11 @@ The current branch also includes bounded database query limits, secure session c
 The repository includes a Render-compatible Docker blueprint in `render.yaml`, a production PHP configuration in `docker/php.ini`, a Docker health probe, and a detailed deployment runbook in [`docs/deployment.md`](docs/deployment.md). The service serves only `public/`, runs idempotent migrations during startup, checks PostgreSQL through `/health.php`, and keeps production secrets in the hosting provider's environment settings.
 
 The default free plan is useful for previews and an early launch. For payment callbacks, consistent latency, and a business-critical storefront, use an always-available paid web service and managed database plan. The app is stateless apart from PostgreSQL, so it can be scaled without relying on local container storage.
+
+### Book cover storage
+
+Book covers are uploaded from the authenticated CMS page at `/admin/books.php` and stored through the S3-compatible adapter in `app/Storage/ObjectStorage.php`. The adapter supports AWS S3, Cloudflare R2, MinIO, and similar providers through the `S3_*` variables in `.env.example`. It validates MIME type and file size before upload and stores only the resulting public URL in PostgreSQL.
+
+### Hosting other websites
+
+This repository can deploy itself like a Render or Railway application. Hosting arbitrary customer websites is a separate product and is not implemented by running Docker inside this public app. The safe control-plane architecture—isolated build workers, image registry, runtime scheduler, custom domains, quotas, secrets, and audit logs—is documented in [`docs/hosting-platform.md`](docs/hosting-platform.md).

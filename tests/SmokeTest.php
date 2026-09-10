@@ -18,6 +18,10 @@ assert(is_file($root . '/database/migrations/004_bookstore.sql'), 'Bookstore mig
 assert(is_file($root . '/render.yaml'), 'Render deployment blueprint must exist.');
 assert(is_file($root . '/docker/php.ini'), 'Production PHP configuration must exist.');
 assert(is_file($root . '/docs/deployment.md'), 'Deployment runbook must exist.');
+assert(is_file($root . '/docs/hosting-platform.md'), 'Hosting platform architecture must exist.');
+assert(is_file($root . '/app/Storage/ObjectStorage.php'), 'Object storage adapter must exist.');
+assert(is_file($root . '/admin/books.php'), 'Authenticated cover manager must exist.');
+assert(is_file($root . '/composer.json') && str_contains((string)file_get_contents($root . '/composer.json'), 'aws/aws-sdk-php'), 'S3 SDK dependency must be declared.');
 assert(is_file($root . '/.dockerignore'), 'Docker build exclusions must exist.');
 assert(!is_dir($root . '/assets'), 'Root-level assets/ must not be recreated.');
 assert(!is_dir($root . '/public/views'), 'Duplicate public/views/ must not be recreated.');

@@ -20,6 +20,20 @@ services:
         fromDatabase:
           name: yurian-personal-db
           property: connectionString
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_REGION
+        value: auto
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY
+        sync: false
+      - key: S3_SECRET_KEY
+        sync: false
+      - key: S3_PUBLIC_BASE_URL
+        sync: false
+      - key: S3_PATH_STYLE
+        value: "false"
 
 databases:
   - name: yurian-personal-db

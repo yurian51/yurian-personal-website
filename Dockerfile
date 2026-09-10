@@ -1,12 +1,15 @@
 FROM php:8.3-apache
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libpq-dev \
+    && apt-get install -y --no-install-recommends libpq-dev unzip \
     && docker-php-ext-install pdo pdo_pgsql \
     && a2enmod rewrite headers expires \
     && rm -rf /var/lib/apt/lists/*
 
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
+COPY composer.json ./
+RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 COPY . /var/www/html
 COPY docker/php.ini /usr/local/etc/php/conf.d/zz-production.ini
 

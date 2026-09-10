@@ -24,9 +24,11 @@ Add the custom domain in the Render service settings, create the DNS records Ren
 
 ## Storage and scaling
 
-The container filesystem is ephemeral. The bookstore currently stores catalog and order data in PostgreSQL and does not depend on local uploads. If the admin later supports cover images or other uploads, use object storage rather than writing files permanently inside the container.
+The container filesystem is ephemeral. Book cover images are stored through the generic S3-compatible adapter in `app/Storage/ObjectStorage.php`, not on the web container. Configure `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_PUBLIC_BASE_URL`, and `S3_PATH_STYLE` in the hosting dashboard. The authenticated CMS page at `/admin/books.php` validates JPEG, PNG, and WebP files up to 5MB before uploading them. Configure the bucket for public read access through a CDN/custom domain or replace the public URL with a signed-delivery strategy before storing private media.
 
 The free plan is appropriate for previews and an early launch but may sleep or have constrained resources. For payment callbacks, time-sensitive checkout, and consistent response latency, use a paid always-available web service and managed PostgreSQL plan. Increase resources only after observing request latency, memory, database connections, and error rate.
+
+This repository can deploy itself like a Render/Railway application, but it is not a multi-tenant hosting platform. The control-plane, isolated build-worker, registry, routing, and quota architecture for hosting other websites is documented in [`hosting-platform.md`](hosting-platform.md). Do not execute customer Docker workloads from this public PHP app.
 
 ## Deployment verification
 
