@@ -1,0 +1,62 @@
+/* AI Glassmorphism Light Theme
+   Keep this file as the visual theme layer so the layout remains independent from brand styling. */
+:root{
+  --ink:#f4f8ff;
+  --ink-soft:#eaf2fb;
+  --ivory:#17243a;
+  --muted:#66758c;
+  --amber:#6c4cff;
+  --clay:#0aa6b7;
+  --line:rgba(92,120,160,.22);
+  --ai-cyan:#19b8d1;
+  --ai-violet:#7657ef;
+  --glass:rgba(255,255,255,.68);
+  --glass-strong:rgba(255,255,255,.84);
+  --shadow:0 24px 70px rgba(62,91,130,.14);
+}
+
+html,body{background:#f4f8ff;color:var(--ivory)}
+body{background:
+  radial-gradient(circle at 8% 10%,rgba(25,184,209,.18),transparent 28%),
+  radial-gradient(circle at 88% 14%,rgba(118,87,239,.16),transparent 30%),
+  linear-gradient(135deg,#f8fbff 0%,#eef5fc 52%,#f8f5ff 100%)}
+body:before{opacity:.20;mix-blend-mode:multiply;background:
+  linear-gradient(135deg,rgba(244,248,255,.72),rgba(231,240,251,.38)),
+  url('/assets/images/yurian-signal.jpg') top center/cover no-repeat}
+body:after{content:"";pointer-events:none;position:fixed;z-index:0;inset:0;opacity:.34;background-image:linear-gradient(rgba(25,184,209,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(118,87,239,.07) 1px,transparent 1px);background-size:46px 46px;mask-image:linear-gradient(to bottom,black,transparent 78%)}
+.site-shell,.footer{position:relative;z-index:1}
+.navbar{border-bottom-color:transparent;background:rgba(255,255,255,.42);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 10px 30px rgba(81,111,149,.06)}
+.navbar.is-scrolled{background:rgba(255,255,255,.78);border-color:var(--line)}
+.brand{color:var(--ivory)}
+.brand b,.brand-mark,.eyebrow,.section-label span:first-child,.row-number,.build-row h3,.build-arrow,.project-arrow,.status-line,.status-chip,.signal-label,.store-price,.store-card__foot strong{color:var(--ai-violet)}
+.navbar nav a,.nav-menu{color:var(--muted)}
+.navbar nav a:hover,.nav-menu:hover{color:var(--ai-violet)}
+.brand-mark{border-color:var(--ai-violet)}
+.hq-hero,.hq-section{position:relative}
+.hq-hero:after{content:"AI / SIGNAL FIELD";position:absolute;right:0;top:116px;color:rgba(102,117,140,.72);font:9px 'DM Mono',monospace;letter-spacing:.18em;transform:rotate(90deg);transform-origin:top right}
+.signal-dot,.status-pulse,.status-chip i,.legend-dot--amber,.status-line i,.signal-ring{background:var(--ai-cyan);border-color:rgba(25,184,209,.45);box-shadow:0 0 0 4px rgba(25,184,209,.10)}
+.signal-core{background:radial-gradient(circle at 34% 33%,#bff7ff 0 4%,#5bcddd 17%,#5c5ae2 48%,#27255e 72%);box-shadow:0 0 55px rgba(25,184,209,.25),inset -18px -15px 30px rgba(39,37,94,.35)}
+.universe-frame{border-color:rgba(25,184,209,.28);background:rgba(255,255,255,.32);box-shadow:var(--shadow);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.universe-frame:before,.universe-frame:after{background:rgba(92,120,160,.18)}
+.hero-intro,.section-heading>p,.lab-heading>div:last-child>p,.library-aside p,.activity-copy,.project-card p,.build-row p,.dossier-copy,.dossier-lede,.store-card p,.store-note{color:var(--muted)}
+.hq-button{border-color:rgba(92,120,160,.28);box-shadow:0 10px 24px rgba(92,120,160,.08)}
+.hq-button--primary{background:linear-gradient(135deg,var(--ai-violet),var(--ai-cyan));border-color:transparent;color:#fff;box-shadow:0 14px 32px rgba(76,104,224,.22)}
+.hq-button--primary:hover{background:linear-gradient(135deg,#5d43d6,#0699aa);color:#fff}
+.hq-button--outline:hover,.hq-text-link:hover{color:var(--ai-violet);border-color:var(--ai-violet)}
+.hq-text-link{color:var(--ivory);border-color:rgba(92,120,160,.38)}
+.hq-build,.hq-activity,.hq-notes{background:rgba(255,255,255,.23)}
+.hq-lab{background:linear-gradient(180deg,transparent,rgba(255,255,255,.48),transparent)}
+.project-card,.lab-tile,.terminal-card,.activity-graph,.store-card,.store-empty,.intake-panel,.checkout-aside{border-color:rgba(92,120,160,.20);background:var(--glass);box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.project-card:hover,.lab-tile:hover{border-color:rgba(25,184,209,.45);background:var(--glass-strong)}
+.project-card h3,.lab-tile h3,.library-row h3,.note-row h3,.dossier-title,.store-card h2,.cart-row h2{color:var(--ivory)}
+.project-card__top,.project-card__foot,.section-label,.mono-label,.store-author,.store-card__foot,.cart-row p,.checkout-aside{color:var(--muted)}
+.project-glyph,.lab-visual,.terminal-top,.project-card__foot,.activity-log,.identity-rule,.dossier-rule,.library-list,.notes-list,.build-list{border-color:rgba(92,120,160,.20)}
+.store-cover{background:radial-gradient(circle at 50% 42%,rgba(25,184,209,.36),transparent 34%),linear-gradient(145deg,#dffaff,#e9e4ff);border-color:rgba(92,120,160,.20);box-shadow:inset 0 0 60px rgba(255,255,255,.35)}
+.store-cover span{color:var(--ai-violet)}
+.store-cover small{color:var(--muted)}
+.footer{background:rgba(255,255,255,.55);border-top-color:rgba(92,120,160,.20);color:var(--muted);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.footer-brand{color:var(--ivory)}
+.contact-form input,.contact-form textarea{border-color:rgba(92,120,160,.25);background:rgba(255,255,255,.68);color:var(--ivory);box-shadow:inset 0 1px 2px rgba(92,120,160,.05)}
+.contact-form input:focus,.contact-form textarea:focus{border-color:var(--ai-cyan);box-shadow:0 0 0 3px rgba(25,184,209,.12)}
+.command-palette__panel{background:rgba(255,255,255,.88);border-color:rgba(92,120,160,.25);box-shadow:var(--shadow);color:var(--ivory);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+@media(max-width:800px){.hq-hero:after{display:none}.navbar{background:rgba(255,255,255,.78)}}

@@ -1,23 +1,43 @@
 name: PHP checks
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
 permissions:
   contents: read
+
 jobs:
-  lint:
+  quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+
       - name: PHP syntax check
         shell: bash
         run: |
           set -euo pipefail
-          files=$(find . -type f -name '*.php' -not -path './vendor/*' -print)
-          test -n "$files"
-          while IFS= read -r file; do php -l "$file"; done <<< "$files"
+          while IFS= read -r -d '' file; do
+            php -l "$file"
+          done < <(find . -type f -name '*.php' -not -path './vendor/*' -print0)
+
+      - name: Run smoke and structure checks
+        run: php tests/SmokeTest.php
+
+      - name: Prevent duplicate frontend sources
+        shell: bash
+        run: |
+          test ! -d assets
+          test ! -d public/views
+          if grep -RInE "(^|[\\\" (])assets/(css|js)/|public/views/" \
+            --exclude-dir=.git --exclude-dir=public/assets \
+            --exclude=README.md --exclude-dir=.github --exclude=SmokeTest.php .; then
+            echo 'Unexpected legacy frontend path reference detected.'
+            exit 1
+          fi

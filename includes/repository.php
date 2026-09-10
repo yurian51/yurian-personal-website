@@ -9,6 +9,7 @@ function profile(): array
 
 function projects(int $limit=12): array
 {
+    $limit = max(1, min($limit, 100));
     try { $s=db()->prepare('SELECT * FROM projects WHERE published=TRUE ORDER BY featured DESC,sort_order ASC,id DESC LIMIT :limit');$s->bindValue(':limit',$limit,PDO::PARAM_INT);$s->execute();return $s->fetchAll(); }
     catch (Throwable $e) { return [
       ['name'=>'YURIAN AI OS','slug'=>'yurian-ai-os','category'=>'AI / Software','summary'=>'An AI-native operating environment for knowledge, projects, documents, workflows and intelligent agents.','url'=>null,'featured'=>true],
@@ -27,6 +28,7 @@ function projectBySlug(string $slug): ?array
 
 function services(int $limit=12): array
 {
+    $limit = max(1, min($limit, 100));
     try { $s=db()->prepare('SELECT * FROM services WHERE published=TRUE ORDER BY sort_order ASC,id DESC LIMIT :limit');$s->bindValue(':limit',$limit,PDO::PARAM_INT);$s->execute();return $s->fetchAll(); }
     catch (Throwable $e) { return [
       ['name'=>'Software Engineering','summary'=>'Custom web applications, APIs and business systems.'],
@@ -55,4 +57,125 @@ function fieldNoteBySlug(string $slug): ?array
 {
     foreach(fieldNotes() as $note){ if(($note['slug'] ?? '') === $slug)return $note; }
     return null;
+}
+
+function books(int $limit=24): array
+{
+    $limit = max(1, min($limit, 100));
+    try {
+        $query = db()->prepare('SELECT id,title,slug,author,description,price,currency,cover_url,stock_quantity,published FROM books WHERE published=TRUE ORDER BY featured DESC,sort_order ASC,id DESC LIMIT :limit');
+        $query->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $query->execute();
+        return $query->fetchAll();
+    } catch (Throwable $e) {
+        return [
+            ['title'=>'The Interface Is Part of the Model','slug'=>'interface-is-part-of-the-model','author'=>'Yurian Mwangi','description'=>'A working book about making intelligent systems legible, negotiable, and useful.','price'=>'18.00','currency'=>'USD','cover_url'=>null,'stock_quantity'=>12,'published'=>true],
+            ['title'=>'Building With a Longer Horizon','slug'=>'building-with-a-longer-horizon','author'=>'Yurian Mwangi','description'=>'Notes on defaults, recovery paths, clear language, and software people can trust.','price'=>'15.00','currency'=>'USD','cover_url'=>null,'stock_quantity'=>8,'published'=>true],
+            ['title'=>'Things That Changed How I Make','slug'=>'things-that-changed-how-i-make','author'=>'Yurian Mwangi','description'=>'A compact reading and making list for builders who want to keep paying attention.','price'=>'12.00','currency'=>'USD','cover_url'=>null,'stock_quantity'=>20,'published'=>true],
+        ];
+    }
+}
+
+function bookBySlug(string $slug): ?array
+{
+    try {
+        $query = db()->prepare('SELECT id,title,slug,author,description,price,currency,cover_url,stock_quantity,published FROM books WHERE slug=:slug AND published=TRUE LIMIT 1');
+        $query->execute([':slug'=>$slug]);
+        $book = $query->fetch();
+        if ($book) return $book;
+    } catch (Throwable $e) {}
+    foreach (books(100) as $book) if (($book['slug'] ?? '') === $slug) return $book;
+    return null;
+}
+
+function cart(): array
+{
+    $cart = $_SESSION['book_cart'] ?? [];
+    if (!is_array($cart)) return [];
+    $clean = [];
+    foreach ($cart as $slug => $quantity) {
+        if (is_string($slug) && preg_match('/^[a-z0-9-]+$/', $slug) && (int)$quantity > 0) {
+            $clean[$slug] = min((int)$quantity, 10);
+        }
+    }
+    $_SESSION['book_cart'] = $clean;
+    return $clean;
+}
+
+function addToCart(string $slug, int $quantity=1): bool
+{
+    $book = bookBySlug($slug);
+    if (!$book || (int)($book['stock_quantity'] ?? 0) < 1) return false;
+    $cart = cart();
+    $cart[$slug] = min(10, ($cart[$slug] ?? 0) + max(1, $quantity));
+    $_SESSION['book_cart'] = $cart;
+    return true;
+}
+
+function removeFromCart(string $slug): void
+{
+    $cart = cart();
+    unset($cart[$slug]);
+    $_SESSION['book_cart'] = $cart;
+}
+
+function cartItems(): array
+{
+    $items = [];
+    foreach (cart() as $slug => $quantity) {
+        $book = bookBySlug($slug);
+        if ($book) {
+            $book['quantity'] = min($quantity, max(0, (int)($book['stock_quantity'] ?? $quantity)));
+            if ($book['quantity'] > 0) {
+                $book['line_total'] = (float)$book['price'] * $book['quantity'];
+                $items[] = $book;
+            }
+        }
+    }
+    return $items;
+}
+
+function cartTotal(): float
+{
+    return array_reduce(cartItems(), fn(float $total, array $item): float => $total + (float)$item['line_total'], 0.0);
+}
+
+function clearCart(): void
+{
+    unset($_SESSION['book_cart']);
+}
+
+function submitBookOrder(string $name, string $email, string $notes, array $items): bool
+{
+    if ($items === []) return false;
+    $pdo = null;
+    try {
+        $pdo = db();
+        $pdo->beginTransaction();
+        $order = $pdo->prepare('INSERT INTO book_orders(customer_name,customer_email,notes,total_amount,currency,status) VALUES(:name,:email,:notes,:total,:currency,:status) RETURNING id');
+        $order->execute([
+            ':name' => $name,
+            ':email' => $email,
+            ':notes' => $notes !== '' ? $notes : null,
+            ':total' => number_format(cartTotal(), 2, '.', ''),
+            ':currency' => $items[0]['currency'] ?? 'USD',
+            ':status' => 'inquiry',
+        ]);
+        $orderId = (int)$order->fetchColumn();
+        $line = $pdo->prepare('INSERT INTO book_order_items(order_id,book_id,title,quantity,unit_price) VALUES(:order_id,:book_id,:title,:quantity,:unit_price)');
+        foreach ($items as $item) {
+            $line->execute([
+                ':order_id' => $orderId,
+                ':book_id' => (int)$item['id'],
+                ':title' => $item['title'],
+                ':quantity' => (int)$item['quantity'],
+                ':unit_price' => number_format((float)$item['price'], 2, '.', ''),
+            ]);
+        }
+        $pdo->commit();
+        return true;
+    } catch (Throwable $e) {
+        if ($pdo instanceof PDO && $pdo->inTransaction()) $pdo->rollBack();
+        return false;
+    }
 }
