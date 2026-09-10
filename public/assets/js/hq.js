@@ -50,4 +50,19 @@
 
   const easter = document.querySelector('#easter-egg'); const sequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']; let cursor = 0;
   document.addEventListener('keydown', (event) => { const key = event.key.length === 1 ? event.key.toLowerCase() : event.key; cursor = key === sequence[cursor] ? cursor + 1 : 0; if (cursor === sequence.length) { cursor = 0; if (easter) { easter.hidden = false; window.setTimeout(() => { easter.hidden = true; }, 3600); } } });
+
+  const githubPanel = document.querySelector('[data-github-activity]');
+  if (githubPanel) {
+    const user = githubPanel.dataset.githubUser || 'yurian51';
+    fetch(`https://api.github.com/users/${encodeURIComponent(user)}/repos?sort=updated&per_page=3`, { headers: { Accept: 'application/vnd.github+json' } })
+      .then((response) => { if (!response.ok) throw new Error('GitHub unavailable'); return response.json(); })
+      .then((repos) => {
+        const items = repos.filter((repo) => !repo.fork).slice(0, 3);
+        githubPanel.querySelector('strong').textContent = items.length ? 'Recent public repositories' : 'No public repositories found';
+        const list = document.createElement('div'); list.className = 'github-repo-list';
+        items.forEach((repo) => { const link = document.createElement('a'); link.href = repo.html_url; link.target = '_blank'; link.rel = 'noreferrer'; link.innerHTML = `<span>${repo.name}</span><small>${repo.language || 'open source'} · updated ${new Date(repo.updated_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</small><b>↗</b>`; list.appendChild(link); });
+        githubPanel.appendChild(list);
+      })
+      .catch(() => { githubPanel.querySelector('strong').textContent = 'Public GitHub signal is unavailable right now'; });
+  }
 })();

@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://yurian.dev/</loc></url>
-  <url><loc>https://yurian.dev/about</loc></url>
-  <url><loc>https://yurian.dev/projects</loc></url>
-  <url><loc>https://yurian.dev/services</loc></url>
-  <url><loc>https://yurian.dev/blog</loc></url>
-  <url><loc>https://yurian.dev/contact</loc></url>
-  <url><loc>https://yurian.dev/privacy</loc></url>
-  <url><loc>https://yurian.dev/terms</loc></url>
+  <url><loc>https://yurian.dev/</loc></url><url><loc>https://yurian.dev/about</loc></url><url><loc>https://yurian.dev/projects</loc></url><url><loc>https://yurian.dev/services</loc></url><url><loc>https://yurian.dev/blog</loc></url><url><loc>https://yurian.dev/contact</loc></url>
+  <url><loc>https://yurian.dev/projects/yurian-ai-os</loc></url><url><loc>https://yurian.dev/projects/altavox-technologies</loc></url><url><loc>https://yurian.dev/projects/sammena-school-system</loc></url>
+  <url><loc>https://yurian.dev/blog/interface-is-part-of-the-model</loc></url><url><loc>https://yurian.dev/blog/building-with-a-longer-horizon</loc></url><url><loc>https://yurian.dev/blog/things-that-changed-how-i-make</loc></url>
+  <url><loc>https://yurian.dev/privacy</loc></url><url><loc>https://yurian.dev/terms</loc></url>
 </urlset>
