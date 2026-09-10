@@ -99,3 +99,9 @@ Verify `/`, `/projects`, `/blog`, `/books`, `/cart`, `/contact`, `/admin/login.p
 ## Additional hardening completed
 
 The current branch also includes bounded database query limits, secure session cookies, Render-compatible database URL parsing, safe JSON response encoding, absolute URL fallback generation, stricter security headers, static asset caching, structural CI guardrails, and transactional book-order persistence.
+
+## Deployment and hosting
+
+The repository includes a Render-compatible Docker blueprint in `render.yaml`, a production PHP configuration in `docker/php.ini`, a Docker health probe, and a detailed deployment runbook in [`docs/deployment.md`](docs/deployment.md). The service serves only `public/`, runs idempotent migrations during startup, checks PostgreSQL through `/health.php`, and keeps production secrets in the hosting provider's environment settings.
+
+The default free plan is useful for previews and an early launch. For payment callbacks, consistent latency, and a business-critical storefront, use an always-available paid web service and managed database plan. The app is stateless apart from PostgreSQL, so it can be scaled without relying on local container storage.

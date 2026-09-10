@@ -2,5 +2,12 @@
 .github
 .gitignore
 .env
-README.md
+.env.*
+!.env.example
 storage/logs
+storage/uploads
+vendor
+node_modules
+README.md
+SECURITY.md
+tests

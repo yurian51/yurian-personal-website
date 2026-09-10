@@ -8,6 +8,14 @@ services:
     autoDeploy: true
     healthCheckPath: /health.php
     envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_TIMEZONE
+        value: Africa/Dar_es_Salaam
+      - key: APP_URL
+        sync: false
       - key: DATABASE_URL
         fromDatabase:
           name: yurian-personal-db

@@ -15,6 +15,10 @@ assert(is_file($root . '/views/books.php'), 'Book catalog view must exist.');
 assert(is_file($root . '/views/cart.php'), 'Book cart view must exist.');
 assert(is_file($root . '/views/checkout.php'), 'Book checkout view must exist.');
 assert(is_file($root . '/database/migrations/004_bookstore.sql'), 'Bookstore migration must exist.');
+assert(is_file($root . '/render.yaml'), 'Render deployment blueprint must exist.');
+assert(is_file($root . '/docker/php.ini'), 'Production PHP configuration must exist.');
+assert(is_file($root . '/docs/deployment.md'), 'Deployment runbook must exist.');
+assert(is_file($root . '/.dockerignore'), 'Docker build exclusions must exist.');
 assert(!is_dir($root . '/assets'), 'Root-level assets/ must not be recreated.');
 assert(!is_dir($root . '/public/views'), 'Duplicate public/views/ must not be recreated.');
 
