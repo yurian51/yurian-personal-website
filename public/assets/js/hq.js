@@ -18,6 +18,36 @@
 
   document.querySelectorAll('[data-filter]').forEach((button) => button.addEventListener('click', () => { document.querySelectorAll('[data-filter]').forEach((item) => item.classList.toggle('active', item === button)); const filter = button.dataset.filter; document.querySelectorAll('[data-category]').forEach((tile) => { tile.hidden = filter !== 'all' && tile.dataset.category !== filter; }); }));
 
+  const terminal = document.querySelector('.terminal-card');
+  const terminalLines = [...document.querySelectorAll('[data-terminal-line]')];
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (terminal && terminalLines.length && !reducedMotion) {
+    const revealTerminal = () => {
+      terminalLines.forEach((line) => { line.textContent = ''; line.classList.remove('is-typing', 'is-complete'); });
+      terminalLines.forEach((line, index) => {
+        const value = line.dataset.terminalLine || '';
+        window.setTimeout(() => {
+          line.classList.add('is-typing');
+          let cursor = 0;
+          const typeNext = () => {
+            line.textContent = value.slice(0, cursor);
+            cursor += 1;
+            if (cursor <= value.length) window.setTimeout(typeNext, 18 + Math.random() * 22);
+            else { line.classList.remove('is-typing'); line.classList.add('is-complete'); }
+          };
+          typeNext();
+        }, index * 480);
+      });
+    };
+    if ('IntersectionObserver' in window) {
+      let hasRevealed = false;
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting) && !hasRevealed) { hasRevealed = true; revealTerminal(); observer.disconnect(); }
+      }, { threshold: 0.35 });
+      observer.observe(terminal);
+    } else revealTerminal();
+  }
+
   const easter = document.querySelector('#easter-egg'); const sequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a']; let cursor = 0;
   document.addEventListener('keydown', (event) => { const key = event.key.length === 1 ? event.key.toLowerCase() : event.key; cursor = key === sequence[cursor] ? cursor + 1 : 0; if (cursor === sequence.length) { cursor = 0; if (easter) { easter.hidden = false; window.setTimeout(() => { easter.hidden = true; }, 3600); } } });
 })();

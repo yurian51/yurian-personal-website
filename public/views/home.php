@@ -53,11 +53,11 @@ $heroName = $displayProfile['name'] ?? 'Arshad Yurian Mwangi';
     <div class="activity-log"><div><span class="status-line"><i></i> now</span><strong>Building a small evaluation harness for agentic workflows</strong><span>private / in progress</span></div><div><span class="status-line"><i class="done"></i> shipped</span><strong>Designing systems that keep context close to the work</strong><span>field notes / active</span></div></div>
   </section>
 
-  <section class="hq-section hq-current" id="currently-building" data-state="EXPERIMENT"><div class="section-label"><span>05</span><span>Currently Building</span></div><div class="current-grid"><div><span class="status-chip"><i></i> ACTIVE THREAD</span><h2>Tools for<br><em>thinking out loud.</em></h2><p>Exploring how an AI layer can help independent builders hold onto context, ask better questions, and ship without losing the thread.</p><a class="hq-button hq-button--outline" href="/contact">Build with me <span>↗</span></a></div><div class="terminal-card"><div class="terminal-top"><span><i></i><i></i><i></i></span><span>yurian / active-thread</span><span>⌘</span></div><pre><span>01</span> const <b>context</b> = await remember(
-<span>02</span>   what_matters: <em>true</em>,
-<span>03</span>   noise: <em>"less"</em>,
-<span>04</span>   next_move: <em>"make"</em>
-<span>05</span> );
+  <section class="hq-section hq-current" id="currently-building" data-state="EXPERIMENT"><div class="section-label"><span>05</span><span>Currently Building</span></div><div class="current-grid"><div><span class="status-chip"><i></i> ACTIVE THREAD</span><h2>Tools for<br><em>thinking out loud.</em></h2><p>Exploring how an AI layer can help independent builders hold onto context, ask better questions, and ship without losing the thread.</p><a class="hq-button hq-button--outline" href="/contact">Build with me <span>↗</span></a></div><div class="terminal-card"><div class="terminal-top"><span><i></i><i></i><i></i></span><span>yurian / active-thread</span><span>⌘</span></div><pre class="terminal-code" aria-label="Live coding environment"><span class="terminal-line" data-terminal-line="01  const context = await remember(">01  const context = await remember(</span>
+<span class="terminal-line" data-terminal-line="02    what_matters: true,">02    what_matters: true,</span>
+<span class="terminal-line" data-terminal-line="03    noise: &quot;less&quot;,">03    noise: &quot;less&quot;,</span>
+<span class="terminal-line" data-terminal-line="04    next_move: &quot;make&quot;">04    next_move: &quot;make&quot;</span>
+<span class="terminal-line" data-terminal-line="05  );">05  );</span>
 
 <span class="terminal-output">→ returning signal <i></i></span></pre></div></div></section>
 
