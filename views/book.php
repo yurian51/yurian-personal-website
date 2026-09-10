@@ -1,0 +1,8 @@
+<?php if (!$book): ?>
+<main class="hq-section"><div class="section-label"><span>404</span><span>Book</span></div><h1 class="dossier-title">That title moved.</h1><p class="dossier-copy">The book is not published or the link has moved.</p><a class="hq-button hq-button--primary" href="/books">Back to the reading room ↗</a></main>
+<?php else: ?>
+<main class="hq-section dossier-page store-detail">
+  <div class="section-label"><span>THE READING ROOM</span><span><?= e(strtoupper($book['author'])) ?></span></div>
+  <div class="store-detail__grid"><div class="store-cover store-cover--large" aria-hidden="true"><span><?= e(strtoupper(substr((string)$book['title'], 0, 1))) ?></span><small>YURIAN<br>PRESS</small></div><div><p class="eyebrow"><span class="signal-dot"></span> BOOK / <?= e(strtoupper($book['currency'] ?? 'USD')) ?></p><h1 class="dossier-title"><?= e($book['title']) ?></h1><p class="dossier-lede"><?= e($book['description']) ?></p><p class="store-author">By <?= e($book['author']) ?></p><div class="store-price"><?= e(number_format((float)$book['price'], 2)) ?> <?= e($book['currency'] ?? 'USD') ?><span><?= (int)($book['stock_quantity'] ?? 0) > 0 ? 'Available now' : 'Currently unavailable' ?></span></div><?php if ((int)($book['stock_quantity'] ?? 0) > 0): ?><form method="post" action="/cart"><input type="hidden" name="_csrf" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="add"><input type="hidden" name="slug" value="<?= e($book['slug']) ?>"><button class="hq-button hq-button--primary" type="submit">Add to cart +</button></form><?php endif; ?><p class="store-note">Orders are confirmed by email before payment and dispatch. No payment is taken on this page.</p></div></div>
+</main>
+<?php endif; ?>

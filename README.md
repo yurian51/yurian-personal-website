@@ -36,6 +36,19 @@ The browser-facing source is intentionally split by delivery responsibility:
 
 This layout keeps executable PHP templates outside the Apache document root while keeping static assets directly cacheable by the web server.
 
+## Reading Room bookstore
+
+The HQ now includes a lightweight book-selling mini app:
+
+- `/books` — published catalog
+- `/books/{slug}` — book detail page
+- `/cart` — session-backed cart with stock-aware quantities
+- `/checkout` — customer inquiry form
+
+Checkout intentionally stops at an **order inquiry**. It stores the requested titles and customer details in PostgreSQL, then the team confirms availability, delivery, and payment manually. No payment is captured by the website yet.
+
+The bookstore schema and seed catalog live in `database/migrations/004_bookstore.sql` and are applied automatically by the migration runner.
+
 ## Local development
 
 1. Copy `.env.example` to `.env`.
@@ -52,7 +65,7 @@ This layout keeps executable PHP templates outside the Apache document root whil
    docker compose exec app php tests/SmokeTest.php
    ```
 
-The application can render fallback content when a database is unavailable, but contact submissions, admin login, and database-backed APIs require PostgreSQL.
+The application can render fallback content when a database is unavailable, but contact submissions, admin login, book inquiries, and database-backed APIs require PostgreSQL.
 
 ## Database migrations
 
@@ -70,7 +83,8 @@ Before merging a change:
 
 ```bash
 find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
-php tests/SmokeTest.php
+php -d zend.assertions=1 -d assert.exception=1 tests/SmokeTest.php
+git diff --check
 ```
 
 When Docker is available, also run:
@@ -80,4 +94,8 @@ docker build -t yurian-personal-website .
 docker compose config
 ```
 
-Verify `/`, `/projects`, `/blog`, `/contact`, `/admin/login.php`, `/api/health`, and `/api/projects` after starting the container.
+Verify `/`, `/projects`, `/blog`, `/books`, `/cart`, `/contact`, `/admin/login.php`, `/api/health`, and `/api/projects` after starting the container.
+
+## Additional hardening completed
+
+The current branch also includes bounded database query limits, secure session cookies, Render-compatible database URL parsing, safe JSON response encoding, absolute URL fallback generation, stricter security headers, static asset caching, structural CI guardrails, and transactional book-order persistence.
