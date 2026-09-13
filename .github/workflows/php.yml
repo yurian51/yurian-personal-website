@@ -18,6 +18,8 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          extensions: pdo_pgsql
+          coverage: none
 
       - name: PHP syntax check
         shell: bash
@@ -27,12 +29,19 @@ jobs:
             php -l "$file"
           done < <(find . -type f -name '*.php' -not -path './vendor/*' -print0)
 
-      - name: Run smoke and structure checks
-        run: php tests/SmokeTest.php
+      - name: Smoke and structure checks
+        run: php -d zend.assertions=1 -d assert.exception=1 tests/SmokeTest.php
+
+      - name: Git whitespace check
+        run: git diff --check
+
+      - name: Composer manifest validation
+        run: composer validate --no-check-publish --no-interaction
 
       - name: Prevent duplicate frontend sources
         shell: bash
         run: |
+          set -euo pipefail
           test ! -d assets
           test ! -d public/views
           if grep -RInE "(^|[\\\" (])assets/(css|js)/|public/views/" \
@@ -41,3 +50,40 @@ jobs:
             echo 'Unexpected legacy frontend path reference detected.'
             exit 1
           fi
+
+      - name: Build production container
+        run: docker build --pull -t yurian-personal-website:ci .
+
+      - name: Validate Compose configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .env.example .env
+          docker compose config >/tmp/compose-config.yml
+          test -s /tmp/compose-config.yml
+
+      - name: Run database-backed integration smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          trap 'docker compose down -v --remove-orphans' EXIT
+          docker compose up -d --build
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:8080/health.php >/tmp/health.json; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              docker compose ps
+              docker compose logs --no-color app db
+              exit 1
+            fi
+            sleep 2
+          done
+          grep -q '"status":"ok"' /tmp/health.json
+          grep -q '"database":"ok"' /tmp/health.json
+          curl --fail --silent --show-error http://127.0.0.1:8080/api/health >/tmp/api-health.json
+          grep -q '"status":"ok"' /tmp/api-health.json
+          grep -q '"database":"ok"' /tmp/api-health.json
+          curl --fail --silent --show-error http://127.0.0.1:8080/api/projects >/tmp/projects.json
+          grep -q '"data"' /tmp/projects.json
+          docker compose exec -T app php -d zend.assertions=1 -d assert.exception=1 tests/SmokeTest.php

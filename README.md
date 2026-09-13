@@ -1,6 +1,6 @@
 # Yurian Personal Website
 
-Production-ready personal brand website built with PHP 8.3, PostgreSQL, Docker, Apache, and Render.
+Production-minded personal brand website built with PHP 8.3, PostgreSQL, Docker, Apache, and Render.
 
 ## Stack
 
@@ -38,7 +38,7 @@ This layout keeps executable PHP templates outside the Apache document root whil
 
 ## Reading Room bookstore
 
-The HQ now includes a lightweight book-selling mini app:
+The HQ includes a lightweight book-selling mini app:
 
 - `/books` — published catalog
 - `/books/{slug}` — book detail page
@@ -62,14 +62,17 @@ The bookstore schema and seed catalog live in `database/migrations/004_bookstore
 4. Run the local checks:
 
    ```bash
-   docker compose exec app php tests/SmokeTest.php
+   docker compose exec app php -d zend.assertions=1 -d assert.exception=1 tests/SmokeTest.php
+   find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+   git diff --check
+   composer validate --no-check-publish --no-interaction
    ```
 
 The application can render fallback content when a database is unavailable, but contact submissions, admin login, book inquiries, and database-backed APIs require PostgreSQL.
 
 ## Database migrations
 
-The container startup runs `database/migrate.php` when database environment variables are available. Migrations are tracked in `schema_migrations` and are applied in filename order, once each. Add new changes as a new numbered migration; do not edit an already-applied migration in place.
+The container startup runs `database/migrate.php` when database environment variables are available. Migrations are tracked in `schema_migrations` and are applied in filename order, once each. The runner serializes concurrent migration attempts with a PostgreSQL advisory lock. Add new changes as a new numbered migration; do not edit an already-applied migration in place.
 
 ## Production
 
@@ -77,25 +80,22 @@ Deploy as a Docker Web Service on Render and attach the configured PostgreSQL da
 
 The production health endpoint is `/health.php`. The public API endpoints are `/api/health` and `/api/projects`.
 
-## Validation checklist
+## CI verification
 
-Before merging a change:
+GitHub Actions performs the repository-level verification on pushes and pull requests to `main`:
 
-```bash
-find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
-php -d zend.assertions=1 -d assert.exception=1 tests/SmokeTest.php
-git diff --check
-```
+- PHP 8.3 syntax lint with `pdo_pgsql`
+- assertion-enabled smoke/structure checks
+- `git diff --check`
+- Composer manifest validation
+- duplicate frontend-source guardrails
+- production Docker image build
+- Docker Compose configuration validation
 
-When Docker is available, also run:
+A CI run that is created but has no executed job steps is treated as **infrastructure/runner failure**, not as evidence that the application passed.
 
-```bash
-docker build -t yurian-personal-website .
-docker compose config
-```
+## Security hardening
 
-Verify `/`, `/projects`, `/blog`, `/books`, `/cart`, `/contact`, `/admin/login.php`, `/api/health`, and `/api/projects` after starting the container.
+Current runtime hardening includes bounded database queries, secure session cookies, centralized PDO configuration, PostgreSQL URL validation, transactional book-order persistence, bounded public form input, database-backed admin login throttling, safe JSON encoding, security headers including a Content Security Policy, static asset caching, and DOM-safe rendering of external GitHub activity data.
 
-## Additional hardening completed
-
-The current branch also includes bounded database query limits, secure session cookies, Render-compatible database URL parsing, safe JSON response encoding, absolute URL fallback generation, stricter security headers, static asset caching, structural CI guardrails, and transactional book-order persistence.
+Do not label the site production-ready solely because a build succeeds. Verify the database-backed flows, authentication, health endpoint, bookstore inquiry flow, public APIs, and deployment environment separately.
