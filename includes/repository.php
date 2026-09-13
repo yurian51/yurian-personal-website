@@ -49,7 +49,7 @@ function fieldNotes(): array
     return [
       ['slug'=>'interface-is-part-of-the-model','type'=>'ESSAY','date'=>'2026-02-09','title'=>'The interface is part of the model','excerpt'=>'A working note on why the layer people touch is not separate from the intelligence underneath.','body'=>['The interface is not a wrapper around the system. It is where the system becomes legible, negotiable, and useful to another person.','When we treat the interface as a final coat of paint, we hide the decisions that matter: what context is visible, what can be changed, and where the human remains in control.','The work is to make those decisions explicit. Good software does not remove complexity by pretending it is gone. It gives complexity a shape we can work with.']],
       ['slug'=>'building-with-a-longer-horizon','type'=>'FIELD NOTE','date'=>'2025-12-11','title'=>'On building with a longer horizon','excerpt'=>'A small argument for software that keeps its promises after the launch post disappears.','body'=>['A product is not finished when it is announced. It is finished when the person using it can trust what happens next.','That trust is built through defaults, recovery paths, clear language, and a willingness to keep the architecture understandable as the surface grows.','The longer horizon is not a slower version of shipping. It is a different definition of done.']],
-      ['slug'=>'things-that-changed-how-i-make','type'=>'READING LIST','date'=>'2025-10-03','title'=>'Things that changed how I make','excerpt'=>'A compact library of ideas, tools, and observations that continue to shape the work.','body'=>['I keep returning to things that make the invisible visible: diagrams, notebooks, source code, field recordings, and conversations with people who use what I build.','The common thread is attention. The best tools do not demand more of it than necessary; they help direct it toward the question that matters.','This list will keep changing. That is part of the point.']],
+      ['slug'=>'things-that-changed-how-i-make','type'=>'READING LIST','date'=>'2025-10-03','title'=>'Things that changed how i make','excerpt'=>'A compact library of ideas, tools, and observations that continue to shape the work.','body'=>['I keep returning to things that make the invisible visible: diagrams, notebooks, source code, field recordings, and conversations with people who use what I build.','The common thread is attention. The best tools do not demand more of it than necessary; they help direct it toward the question that matters.','This list will keep changing. That is part of the point.']],
     ];
 }
 
@@ -150,21 +150,55 @@ function submitBookOrder(string $name, string $email, string $notes, array $item
     if ($items === []) return false;
     $pdo = null;
     try {
-        $total = 0.0;
-        $currency = null;
-        foreach ($items as $item) {
-            $quantity = (int)($item['quantity'] ?? 0);
-            $price = (float)($item['price'] ?? -1);
-            $itemCurrency = strtoupper(trim((string)($item['currency'] ?? '')));
-            if ($quantity < 1 || $quantity > 10 || $price < 0 || !preg_match('/^[A-Z]{3}$/', $itemCurrency)) return false;
-            if ($currency === null) $currency = $itemCurrency;
-            if ($currency !== $itemCurrency) return false;
-            $total += $price * $quantity;
-        }
-        if ($currency === null || !is_finite($total)) return false;
-
         $pdo = db();
         $pdo->beginTransaction();
+
+        $lookup = $pdo->prepare('SELECT id,title,price,currency,stock_quantity FROM books WHERE id=:id AND published=TRUE LIMIT 1 FOR SHARE');
+        $authoritativeItems = [];
+        $total = 0.0;
+        $currency = null;
+
+        foreach ($items as $item) {
+            $bookId = filter_var($item['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+            $quantity = filter_var($item['quantity'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 10]]);
+            if ($bookId === false || $quantity === false) {
+                $pdo->rollBack();
+                return false;
+            }
+
+            $lookup->execute([':id' => $bookId]);
+            $book = $lookup->fetch();
+            if (!$book || (int)$book['stock_quantity'] < $quantity) {
+                $pdo->rollBack();
+                return false;
+            }
+
+            $itemCurrency = strtoupper((string)$book['currency']);
+            if (!preg_match('/^[A-Z]{3}$/', $itemCurrency)) {
+                $pdo->rollBack();
+                return false;
+            }
+            if ($currency === null) $currency = $itemCurrency;
+            if ($currency !== $itemCurrency) {
+                $pdo->rollBack();
+                return false;
+            }
+
+            $unitPrice = (float)$book['price'];
+            $total += $unitPrice * $quantity;
+            $authoritativeItems[] = [
+                'id' => (int)$book['id'],
+                'title' => (string)$book['title'],
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+            ];
+        }
+
+        if ($currency === null || !is_finite($total) || $total > 99999999.99) {
+            $pdo->rollBack();
+            return false;
+        }
+
         $order = $pdo->prepare('INSERT INTO book_orders(customer_name,customer_email,notes,total_amount,currency,status) VALUES(:name,:email,:notes,:total,:currency,:status) RETURNING id');
         $order->execute([
             ':name' => $name,
@@ -175,20 +209,22 @@ function submitBookOrder(string $name, string $email, string $notes, array $item
             ':status' => 'inquiry',
         ]);
         $orderId = (int)$order->fetchColumn();
+
         $line = $pdo->prepare('INSERT INTO book_order_items(order_id,book_id,title,quantity,unit_price) VALUES(:order_id,:book_id,:title,:quantity,:unit_price)');
-        foreach ($items as $item) {
+        foreach ($authoritativeItems as $item) {
             $line->execute([
                 ':order_id' => $orderId,
-                ':book_id' => (int)$item['id'],
-                ':title' => (string)$item['title'],
-                ':quantity' => (int)$item['quantity'],
-                ':unit_price' => number_format((float)$item['price'], 2, '.', ''),
+                ':book_id' => $item['id'],
+                ':title' => $item['title'],
+                ':quantity' => $item['quantity'],
+                ':unit_price' => number_format($item['unit_price'], 2, '.', ''),
             ]);
         }
         $pdo->commit();
         return true;
     } catch (Throwable $e) {
         if ($pdo instanceof PDO && $pdo->inTransaction()) $pdo->rollBack();
+        error_log('[book-order] persistence failed: ' . get_class($e));
         return false;
     }
 }
