@@ -17,6 +17,7 @@ assert(is_file($root . '/views/cart.php'), 'Book cart view must exist.');
 assert(is_file($root . '/views/checkout.php'), 'Book checkout view must exist.');
 assert(is_file($root . '/database/migrations/004_bookstore.sql'), 'Bookstore migration must exist.');
 assert(is_file($root . '/database/migrations/005_security.sql'), 'Security migration must exist.');
+assert(is_file($root . '/database/migrations/006_schema_compatibility.sql'), 'Schema compatibility migration must exist.');
 assert(!is_file($root . '/health.php'), 'Unreachable root health endpoint must not return.');
 assert(!is_dir($root . '/assets'), 'Root-level assets/ must not be recreated.');
 assert(!is_dir($root . '/public/views'), 'Duplicate public/views/ must not be recreated.');
@@ -28,6 +29,18 @@ assert(is_string($router) && str_contains($router, "'books'=>"), 'Router must ex
 $health = file_get_contents($root . '/public/health.php');
 assert(is_string($health) && str_contains($health, "require_once __DIR__ . '/../config/bootstrap.php';"), 'Health endpoint must load the application bootstrap.');
 assert(is_string($health) && str_contains($health, "header('Cache-Control: no-store');"), 'Health endpoint must not be cached.');
+
+$apiHealth = file_get_contents($root . '/public/api/health.php');
+assert(is_string($apiHealth) && str_contains($apiHealth, "db()->query('SELECT 1')"), 'API health endpoint must verify database readiness.');
+assert(is_string($apiHealth) && str_contains($apiHealth, "http_response_code(503)"), 'API health endpoint must expose degraded status when the database is unavailable.');
+
+$migrate = file_get_contents($root . '/database/migrate.php');
+assert(is_string($migrate) && str_contains($migrate, 'pg_advisory_lock'), 'Migration runner must serialize concurrent migration attempts.');
+assert(is_string($migrate) && str_contains($migrate, 'Unable to read migration'), 'Migration runner must fail explicitly when a migration file cannot be read.');
+
+$projectView = file_get_contents($root . '/views/project.php');
+assert(is_string($projectView) && str_contains($projectView, 'safe_link'), 'Project view must validate external project links.');
+assert(is_string($projectView) && str_contains($projectView, 'noopener noreferrer'), 'External project links must prevent opener access.');
 
 $logout = file_get_contents($root . '/admin/logout.php');
 assert(is_string($logout) && str_contains($logout, "$_SERVER['REQUEST_METHOD'] !== 'POST'"), 'Admin logout must require POST.');
