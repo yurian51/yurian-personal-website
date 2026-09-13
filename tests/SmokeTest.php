@@ -12,6 +12,7 @@ assert(is_file($root . '/public/health.php'), 'Production health endpoint must e
 assert(is_file($root . '/public/assets/css/app.css'), 'Canonical app stylesheet must exist.');
 assert(is_file($root . '/public/assets/css/institutional.css'), 'Institutional stylesheet must exist.');
 assert(is_file($root . '/public/assets/js/hq.js'), 'Canonical frontend script must exist.');
+assert(is_file($root . '/public/.htaccess'), 'Public Apache configuration must exist.');
 assert(is_dir($root . '/views'), 'Canonical server-side views directory must exist.');
 assert(is_file($root . '/views/books.php'), 'Book catalog view must exist.');
 assert(is_file($root . '/views/cart.php'), 'Book cart view must exist.');
@@ -49,6 +50,14 @@ assert(is_string($frontend) && str_contains($frontend, "event.key === 'Escape'")
 $home = file_get_contents($root . '/views/home.php');
 assert(is_string($home) && str_contains($home, 'data-github-activity'), 'Homepage must retain the public GitHub activity integration.');
 assert(is_string($home) && str_contains($home, '/projects'), 'Homepage must retain project navigation.');
+
+$apache = file_get_contents($root . '/public/.htaccess');
+assert(is_string($apache) && str_contains($apache, 'X-Content-Type-Options "nosniff"'), 'Apache configuration must set MIME sniffing protection.');
+assert(is_string($apache) && str_contains($apache, 'X-Frame-Options "SAMEORIGIN"'), 'Apache configuration must restrict framing.');
+assert(is_string($apache) && str_contains($apache, 'Referrer-Policy "strict-origin-when-cross-origin"'), 'Apache configuration must define a restrictive referrer policy.');
+assert(is_string($apache) && str_contains($apache, 'Permissions-Policy "camera=(), microphone=(), geolocation=()"'), 'Apache configuration must disable unused sensitive browser capabilities.');
+assert(is_string($apache) && str_contains($apache, "script-src 'self'; connect-src 'self' https://api.github.com"), 'CSP must restrict executable scripts and GitHub API connections.');
+assert(is_string($apache) && str_contains($apache, 'frame-ancestors \'self\''), 'CSP must restrict framing origins.');
 
 $health = file_get_contents($root . '/public/health.php');
 assert(is_string($health) && str_contains($health, "putenv('SKIP_SESSION_START=1');"), 'Health endpoint must not create application sessions.');
