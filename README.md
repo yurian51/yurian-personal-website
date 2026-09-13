@@ -1,6 +1,6 @@
 # Yurian Personal Website
 
-Production-ready personal brand website built with PHP 8.3, PostgreSQL, Docker, Apache, and Render.
+Production-minded personal brand website built with PHP 8.3, PostgreSQL, Docker, Apache, and Render.
 
 ## Stack
 
@@ -72,7 +72,7 @@ The application can render fallback content when a database is unavailable, but 
 
 ## Database migrations
 
-The container startup runs `database/migrate.php` when database environment variables are available. Migrations are tracked in `schema_migrations` and are applied in filename order, once each. Add new changes as a new numbered migration; do not edit an already-applied migration in place.
+The container startup runs `database/migrate.php` when database environment variables are available. Migrations are tracked in `schema_migrations` and are applied in filename order, once each. The runner serializes concurrent migration attempts with a PostgreSQL advisory lock. Add new changes as a new numbered migration; do not edit an already-applied migration in place.
 
 ## Production
 
