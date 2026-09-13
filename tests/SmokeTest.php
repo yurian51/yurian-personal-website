@@ -49,7 +49,11 @@ assert(is_string($frontend) && str_contains($frontend, "event.key === 'Escape'")
 
 $home = file_get_contents($root . '/views/home.php');
 assert(is_string($home) && str_contains($home, 'data-github-activity'), 'Homepage must retain the public GitHub activity integration.');
-assert(is_string($home) && str_contains($home, '/projects'), 'Homepage must retain project navigation.');
+assert(is_string($home) && str_contains($home, 'safe_link('), 'Homepage project links must pass through safe_link().');
+assert(is_string($home) && str_contains($home, 'YURIAN TECHNOLOGY SYSTEMS'), 'Homepage must use the institutional technology identity.');
+assert(is_string($home) && str_contains($home, 'Technology Lab'), 'Homepage must use institutional lab terminology.');
+assert(is_string($home) && !str_contains($home, 'YURIAN // DIGITAL HQ'), 'Legacy Digital HQ branding must not remain on the homepage.');
+assert(is_string($home) && !str_contains($home, 'THE YURIAN UNIVERSE'), 'Legacy universe branding must not remain on the homepage.');
 
 $apache = file_get_contents($root . '/public/.htaccess');
 assert(is_string($apache) && str_contains($apache, 'X-Content-Type-Options "nosniff"'), 'Apache configuration must set MIME sniffing protection.');
