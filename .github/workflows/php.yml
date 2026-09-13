@@ -18,6 +18,8 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          extensions: pdo_pgsql
+          coverage: none
 
       - name: PHP syntax check
         shell: bash
@@ -27,12 +29,19 @@ jobs:
             php -l "$file"
           done < <(find . -type f -name '*.php' -not -path './vendor/*' -print0)
 
-      - name: Run smoke and structure checks
-        run: php tests/SmokeTest.php
+      - name: Smoke and structure checks
+        run: php -d zend.assertions=1 -d assert.exception=1 tests/SmokeTest.php
+
+      - name: Git whitespace check
+        run: git diff --check
+
+      - name: Composer manifest validation
+        run: composer validate --no-check-publish --no-interaction
 
       - name: Prevent duplicate frontend sources
         shell: bash
         run: |
+          set -euo pipefail
           test ! -d assets
           test ! -d public/views
           if grep -RInE "(^|[\\\" (])assets/(css|js)/|public/views/" \
@@ -41,3 +50,13 @@ jobs:
             echo 'Unexpected legacy frontend path reference detected.'
             exit 1
           fi
+
+      - name: Build production container
+        run: docker build --pull -t yurian-personal-website:ci .
+
+      - name: Validate Compose configuration
+        shell: bash
+        run: |
+          cp .env.example .env
+          docker compose config >/tmp/compose-config.yml
+          test -s /tmp/compose-config.yml
