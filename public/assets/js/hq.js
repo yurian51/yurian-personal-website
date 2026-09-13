@@ -59,8 +59,24 @@
       .then((repos) => {
         const items = repos.filter((repo) => !repo.fork).slice(0, 3);
         githubPanel.querySelector('strong').textContent = items.length ? 'Recent public repositories' : 'No public repositories found';
-        const list = document.createElement('div'); list.className = 'github-repo-list';
-        items.forEach((repo) => { const link = document.createElement('a'); link.href = repo.html_url; link.target = '_blank'; link.rel = 'noreferrer'; link.innerHTML = `<span>${repo.name}</span><small>${repo.language || 'open source'} · updated ${new Date(repo.updated_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</small><b>↗</b>`; list.appendChild(link); });
+        const list = document.createElement('div');
+        list.className = 'github-repo-list';
+        items.forEach((repo) => {
+          const link = document.createElement('a');
+          link.href = repo.html_url;
+          link.target = '_blank';
+          link.rel = 'noreferrer';
+          const name = document.createElement('span');
+          name.textContent = String(repo.name || 'Repository');
+          const meta = document.createElement('small');
+          const language = String(repo.language || 'open source');
+          const updated = new Date(repo.updated_at);
+          meta.textContent = `${language} · updated ${Number.isNaN(updated.getTime()) ? 'recently' : updated.toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}`;
+          const arrow = document.createElement('b');
+          arrow.textContent = '↗';
+          link.append(name, meta, arrow);
+          list.appendChild(link);
+        });
         githubPanel.appendChild(list);
       })
       .catch(() => { githubPanel.querySelector('strong').textContent = 'Public GitHub signal is unavailable right now'; });
