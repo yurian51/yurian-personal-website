@@ -150,6 +150,19 @@ function submitBookOrder(string $name, string $email, string $notes, array $item
     if ($items === []) return false;
     $pdo = null;
     try {
+        $total = 0.0;
+        $currency = null;
+        foreach ($items as $item) {
+            $quantity = (int)($item['quantity'] ?? 0);
+            $price = (float)($item['price'] ?? -1);
+            $itemCurrency = strtoupper(trim((string)($item['currency'] ?? '')));
+            if ($quantity < 1 || $quantity > 10 || $price < 0 || !preg_match('/^[A-Z]{3}$/', $itemCurrency)) return false;
+            if ($currency === null) $currency = $itemCurrency;
+            if ($currency !== $itemCurrency) return false;
+            $total += $price * $quantity;
+        }
+        if ($currency === null || !is_finite($total)) return false;
+
         $pdo = db();
         $pdo->beginTransaction();
         $order = $pdo->prepare('INSERT INTO book_orders(customer_name,customer_email,notes,total_amount,currency,status) VALUES(:name,:email,:notes,:total,:currency,:status) RETURNING id');
@@ -157,8 +170,8 @@ function submitBookOrder(string $name, string $email, string $notes, array $item
             ':name' => $name,
             ':email' => $email,
             ':notes' => $notes !== '' ? $notes : null,
-            ':total' => number_format(cartTotal(), 2, '.', ''),
-            ':currency' => $items[0]['currency'] ?? 'USD',
+            ':total' => number_format($total, 2, '.', ''),
+            ':currency' => $currency,
             ':status' => 'inquiry',
         ]);
         $orderId = (int)$order->fetchColumn();
@@ -167,7 +180,7 @@ function submitBookOrder(string $name, string $email, string $notes, array $item
             $line->execute([
                 ':order_id' => $orderId,
                 ':book_id' => (int)$item['id'],
-                ':title' => $item['title'],
+                ':title' => (string)$item['title'],
                 ':quantity' => (int)$item['quantity'],
                 ':unit_price' => number_format((float)$item['price'], 2, '.', ''),
             ]);
