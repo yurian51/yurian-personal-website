@@ -3,11 +3,12 @@ $displayProjects = $projects ?? projects(6);
 $displayServices = services(4);
 $displayProfile = $profile ?? profile();
 $heroName = $displayProfile['name'] ?? 'Arshad Yurian Mwangi';
+$displayLocation = trim((string)($displayProfile['location'] ?? 'Tanzania')) ?: 'Tanzania';
 ?>
 <main id="main-content" data-scroll-state="ORIGIN">
   <section class="hq-hero" id="top" data-state="ORIGIN">
     <div class="hq-hero__copy">
-      <p class="eyebrow"><span class="signal-dot"></span> Nairobi / EAT · 2026</p>
+      <p class="eyebrow"><span class="signal-dot"></span> <?= e($displayLocation) ?> / EAT · <?= date('Y') ?></p>
       <h1>BUILDING<br><em>SYSTEMS</em><br>FOR WHAT<br><span>COMES NEXT.</span></h1>
       <p class="hero-intro"><?= e($displayProfile['intro'] ?? 'Software engineer, AI builder, technology entrepreneur, and creator making useful things for an uncertain future.') ?></p>
       <div class="hero-actions">
@@ -20,7 +21,7 @@ $heroName = $displayProfile['name'] ?? 'Arshad Yurian Mwangi';
       <div class="signal-ring signal-ring--one"></div><div class="signal-ring signal-ring--two"></div>
       <div class="signal-core"><span>Y</span></div>
       <div class="signal-label">◉ SIGNAL / 001</div>
-      <div class="coordinates">-1.2921° S<br>36.8219° E</div>
+      <div class="coordinates">EAST AFRICA / EAT<br>GLOBAL / REMOTE</div>
     </div>
     <div class="hero-foot"><span>© <?= date('Y') ?> YURIAN // DIGITAL HQ</span><span>AVAILABLE FOR SELECT BUILDS <i></i></span></div>
   </section>
@@ -29,7 +30,7 @@ $heroName = $displayProfile['name'] ?? 'Arshad Yurian Mwangi';
     <div class="section-label"><span>01</span><span>Identity</span></div>
     <div class="identity-grid">
       <p class="display-kicker">Not a portfolio.<br><em>A point of view.</em></p>
-      <div class="identity-copy"><p class="lede">I build at the intersection of <strong>engineering, intelligence, and culture.</strong> My work is an attempt to make technology feel less like a force acting on us — and more like a material we can shape together.</p><div class="identity-details"><div><span>ROLE</span><p>Engineer / Builder<br>Independent operator</p></div><div><span>BASED IN</span><p><?= e($displayProfile['location'] ?? 'Nairobi, Kenya') ?><br>Working globally</p></div><div><span>CURRENT MODE</span><p><i class="status-pulse"></i> Curious, in motion</p></div></div></div>
+      <div class="identity-copy"><p class="lede">I build at the intersection of <strong>engineering, intelligence, and culture.</strong> My work is an attempt to make technology feel less like a force acting on us — and more like a material we can shape together.</p><div class="identity-details"><div><span>ROLE</span><p>Engineer / Builder<br>Independent operator</p></div><div><span>BASED IN</span><p><?= e($displayLocation) ?><br>Working globally</p></div><div><span>CURRENT MODE</span><p><i class="status-pulse"></i> Curious, in motion</p></div></div></div>
     </div><div class="identity-rule"></div><div class="identity-bottom"><span>Software should expand human agency.</span><span>— a working principle</span></div>
   </section>
 
