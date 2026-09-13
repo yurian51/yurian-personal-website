@@ -38,6 +38,7 @@ assert(url('/books') === 'https://example.test/books', 'Configured APP_URL must 
 putenv('APP_URL');
 
 assert(safe_link('/projects/example') === '/projects/example', 'Relative project links must remain supported.');
+assert(safe_link('//evil.example/project') === null, 'Protocol-relative external links must be rejected.');
 assert(safe_link('https://example.test/project') === 'https://example.test/project', 'HTTPS project links must be supported.');
 assert(safe_link('javascript:alert(1)') === null, 'Unsafe javascript links must be rejected.');
 assert(safe_link('data:text/html,test') === null, 'Unsafe data links must be rejected.');
