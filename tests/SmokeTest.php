@@ -10,6 +10,7 @@ assert(is_file($root . '/Dockerfile'), 'Dockerfile must exist.');
 assert(is_file($root . '/public/index.php'), 'Public router must exist.');
 assert(is_file($root . '/public/health.php'), 'Production health endpoint must exist.');
 assert(is_file($root . '/public/assets/css/app.css'), 'Canonical app stylesheet must exist.');
+assert(is_file($root . '/public/assets/css/institutional.css'), 'Institutional stylesheet must exist.');
 assert(is_file($root . '/public/assets/js/hq.js'), 'Canonical frontend script must exist.');
 assert(is_dir($root . '/views'), 'Canonical server-side views directory must exist.');
 assert(is_file($root . '/views/books.php'), 'Book catalog view must exist.');
@@ -26,6 +27,28 @@ assert(!is_dir($root . '/public/views'), 'Duplicate public/views/ must not be re
 $router = file_get_contents($root . '/public/index.php');
 assert(is_string($router) && str_contains($router, "require __DIR__.'/../views/"), 'Router must load the canonical views directory.');
 assert(is_string($router) && str_contains($router, "'books'=>"), 'Router must expose the Reading Room.');
+
+$header = file_get_contents($root . '/includes/header.php');
+assert(is_string($header) && str_contains($header, '/assets/css/institutional.css'), 'Shared header must load the institutional stylesheet.');
+assert(is_string($header) && str_contains($header, 'YURIAN <b>//</b> TECHNOLOGY'), 'Shared header must use the institutional brand.');
+assert(is_string($header) && str_contains($header, 'aria-controls="primary-navigation"'), 'Mobile navigation must expose its controlled target.');
+assert(is_string($header) && str_contains($header, 'aria-expanded="false"'), 'Mobile navigation must expose its initial expanded state.');
+assert(is_string($header) && str_contains($header, 'href="#main-content"'), 'Shared header must expose a skip-to-content link.');
+
+$footer = file_get_contents($root . '/includes/footer.php');
+assert(is_string($footer) && str_contains($footer, 'Portfolio'), 'Footer must expose the portfolio route.');
+assert(is_string($footer) && str_contains($footer, 'Publications'), 'Footer must expose the publications route.');
+assert(is_string($footer) && str_contains($footer, 'Insights'), 'Footer must expose the insights route.');
+assert(is_string($footer) && str_contains($footer, 'Privacy'), 'Footer must expose the privacy route.');
+
+$frontend = file_get_contents($root . '/public/assets/js/hq.js');
+assert(is_string($frontend) && str_contains($frontend, 'setNavOpen'), 'Frontend must implement mobile navigation state.');
+assert(is_string($frontend) && str_contains($frontend, "navToggle.setAttribute('aria-expanded'"), 'Frontend must synchronize navigation accessibility state.');
+assert(is_string($frontend) && str_contains($frontend, "event.key === 'Escape'"), 'Frontend must close overlays and navigation on Escape.');
+
+$home = file_get_contents($root . '/views/home.php');
+assert(is_string($home) && str_contains($home, 'data-github-activity'), 'Homepage must retain the public GitHub activity integration.');
+assert(is_string($home) && str_contains($home, '/projects'), 'Homepage must retain project navigation.');
 
 $health = file_get_contents($root . '/public/health.php');
 assert(is_string($health) && str_contains($health, "putenv('SKIP_SESSION_START=1');"), 'Health endpoint must not create application sessions.');
