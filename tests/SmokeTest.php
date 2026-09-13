@@ -81,7 +81,7 @@ assert(is_string($projectView) && str_contains($projectView, 'safe_link'), 'Proj
 assert(is_string($projectView) && str_contains($projectView, 'noopener noreferrer'), 'External project links must prevent opener access.');
 
 $logout = file_get_contents($root . '/admin/logout.php');
-assert(is_string($logout) && str_contains($logout, "$_SERVER['REQUEST_METHOD'] !== 'POST'"), 'Admin logout must require POST.');
+assert(is_string($logout) && str_contains($logout, '$_SERVER[\'REQUEST_METHOD\'] !== \'POST\''), 'Admin logout must require POST.');
 assert(is_string($logout) && str_contains($logout, 'verify_csrf'), 'Admin logout must verify CSRF.');
 
 putenv('APP_URL=https://example.test');
