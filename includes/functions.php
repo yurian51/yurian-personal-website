@@ -27,7 +27,7 @@ function safe_link(?string $candidate): ?string
 {
     $candidate = trim((string) $candidate);
     if ($candidate === '') return null;
-    if (str_starts_with($candidate, '/')) return $candidate;
+    if ($candidate[0] === '/' && !str_starts_with($candidate, '//')) return $candidate;
     if (!filter_var($candidate, FILTER_VALIDATE_URL)) return null;
     $scheme = strtolower((string) parse_url($candidate, PHP_URL_SCHEME));
     return in_array($scheme, ['https', 'http'], true) ? $candidate : null;
