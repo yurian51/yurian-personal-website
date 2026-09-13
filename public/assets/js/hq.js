@@ -3,13 +3,30 @@
   const palette = document.querySelector('#command-palette');
   const input = document.querySelector('#command-input');
   const nav = document.querySelector('#site-nav');
+  const navToggle = document.querySelector('.nav-toggle');
+  const primaryNav = document.querySelector('#primary-navigation');
+  const setNavOpen = (open) => {
+    if (!nav || !navToggle) return;
+    nav.classList.toggle('nav-open', open);
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    navToggle.textContent = open ? 'Close' : 'Menu';
+  };
   const openPalette = () => { if (!palette) return; palette.hidden = false; document.body.classList.add('palette-open'); input?.focus(); };
   const closePalette = () => { if (!palette) return; palette.hidden = true; document.body.classList.remove('palette-open'); };
   document.querySelector('[data-command-open]')?.addEventListener('click', openPalette);
   document.querySelectorAll('[data-command-target]').forEach((button) => button.addEventListener('click', () => { document.querySelector(button.dataset.commandTarget)?.scrollIntoView({ behavior: 'smooth' }); closePalette(); }));
   document.querySelector('[data-command-close]')?.addEventListener('click', closePalette);
   palette?.addEventListener('click', (event) => { if (event.target === palette) closePalette(); });
-  document.addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openPalette(); } if (event.key === 'Escape') closePalette(); });
+  navToggle?.addEventListener('click', () => setNavOpen(!nav?.classList.contains('nav-open')));
+  primaryNav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setNavOpen(false)));
+  document.addEventListener('click', (event) => {
+    if (!nav?.classList.contains('nav-open') || !(event.target instanceof Node) || nav.contains(event.target)) return;
+    setNavOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openPalette(); }
+    if (event.key === 'Escape') { closePalette(); setNavOpen(false); }
+  });
   window.addEventListener('scroll', () => nav?.classList.toggle('is-scrolled', window.scrollY > 32), { passive: true });
   input?.addEventListener('input', () => { const query = input.value.toLowerCase(); document.querySelectorAll('.command-list button').forEach((button) => { button.hidden = !button.textContent.toLowerCase().includes(query); }); });
 
