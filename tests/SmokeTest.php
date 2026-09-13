@@ -15,6 +15,8 @@ assert(is_file($root . '/views/books.php'), 'Book catalog view must exist.');
 assert(is_file($root . '/views/cart.php'), 'Book cart view must exist.');
 assert(is_file($root . '/views/checkout.php'), 'Book checkout view must exist.');
 assert(is_file($root . '/database/migrations/004_bookstore.sql'), 'Bookstore migration must exist.');
+assert(is_file($root . '/database/migrations/005_security.sql'), 'Security migration must exist.');
+assert(!is_file($root . '/health.php'), 'Unreachable root health endpoint must not return.');
 assert(!is_dir($root . '/assets'), 'Root-level assets/ must not be recreated.');
 assert(!is_dir($root . '/public/views'), 'Duplicate public/views/ must not be recreated.');
 
@@ -25,5 +27,11 @@ assert(is_string($router) && str_contains($router, "'books'=>"), 'Router must ex
 putenv('APP_URL=https://example.test');
 assert(url('/books') === 'https://example.test/books', 'Configured APP_URL must produce absolute URLs.');
 putenv('APP_URL');
+
+assert(safe_link('/projects/example') === '/projects/example', 'Relative project links must remain supported.');
+assert(safe_link('https://example.test/project') === 'https://example.test/project', 'HTTPS project links must be supported.');
+assert(safe_link('javascript:alert(1)') === null, 'Unsafe javascript links must be rejected.');
+assert(safe_link('data:text/html,test') === null, 'Unsafe data links must be rejected.');
+assert(e('<script>') === '&lt;script&gt;', 'HTML escaping must remain enabled.');
 
 echo "Smoke tests passed.\n";
