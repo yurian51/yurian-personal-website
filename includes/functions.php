@@ -29,7 +29,9 @@ function safe_link(?string $candidate): ?string
     if ($candidate === '') return null;
     if ($candidate[0] === '/' && !str_starts_with($candidate, '//')) return $candidate;
     if (!filter_var($candidate, FILTER_VALIDATE_URL)) return null;
-    $scheme = strtolower((string) parse_url($candidate, PHP_URL_SCHEME));
+    $parts = parse_url($candidate);
+    if ($parts === false || empty($parts['host']) || isset($parts['user']) || isset($parts['pass'])) return null;
+    $scheme = strtolower((string) ($parts['scheme'] ?? ''));
     return in_array($scheme, ['https', 'http'], true) ? $candidate : null;
 }
 
