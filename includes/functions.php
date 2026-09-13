@@ -23,6 +23,16 @@ function url(string $path = '/'): string
     return $scheme . '://' . $host . '/' . ltrim($path, '/');
 }
 
+function safe_link(?string $candidate): ?string
+{
+    $candidate = trim((string) $candidate);
+    if ($candidate === '') return null;
+    if (str_starts_with($candidate, '/')) return $candidate;
+    if (!filter_var($candidate, FILTER_VALIDATE_URL)) return null;
+    $scheme = strtolower((string) parse_url($candidate, PHP_URL_SCHEME));
+    return in_array($scheme, ['https', 'http'], true) ? $candidate : null;
+}
+
 function csrf_token(): string
 {
     return \App\Security\Csrf::token();
