@@ -10,7 +10,7 @@
 
   const updateProgress = () => {
     const max = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+    bar.style.transform = `scaleX(${max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0})`;
   };
   updateProgress();
   window.addEventListener('scroll', updateProgress, { passive: true });
@@ -18,8 +18,8 @@
 
   const presence = document.createElement('aside');
   presence.className = 'hq-presence';
-  presence.setAttribute('aria-label', 'Yurian Digital HQ status');
-  presence.innerHTML = '<span class="hq-presence__dot" aria-hidden="true"></span><span>HQ <strong>online</strong></span><span aria-hidden="true">·</span><span id="hq-clock">--:--</span>';
+  presence.setAttribute('aria-label', 'Yurian Digital HQ local time');
+  presence.innerHTML = '<span class="hq-presence__dot" aria-hidden="true"></span><span>HQ <strong>live view</strong></span><span aria-hidden="true">·</span><span id="hq-clock">--:--</span>';
   document.body.appendChild(presence);
 
   const clock = presence.querySelector('#hq-clock');
