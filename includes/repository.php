@@ -107,6 +107,11 @@ function addToCart(string $slug, int $quantity=1): bool
     $book = bookBySlug($slug);
     if (!$book || (int)($book['stock_quantity'] ?? 0) < 1) return false;
     $cart = cart();
+    if ($cart !== []) {
+        $existingItems = cartItems();
+        $existingCurrency = $existingItems[0]['currency'] ?? null;
+        if ($existingCurrency !== null && strtoupper((string)$book['currency']) !== strtoupper((string)$existingCurrency)) return false;
+    }
     $cart[$slug] = min(10, ($cart[$slug] ?? 0) + max(1, $quantity));
     $_SESSION['book_cart'] = $cart;
     return true;
@@ -152,30 +157,54 @@ function submitBookOrder(string $name, string $email, string $notes, array $item
     try {
         $pdo = db();
         $pdo->beginTransaction();
+
+        $current = [];
+        $bookQuery = $pdo->prepare('SELECT id,title,slug,price,currency,stock_quantity FROM books WHERE slug=:slug AND published=TRUE FOR UPDATE');
+        foreach ($items as $item) {
+            $slug = (string)($item['slug'] ?? '');
+            $quantity = (int)($item['quantity'] ?? 0);
+            if (!preg_match('/^[a-z0-9-]+$/', $slug) || $quantity < 1 || $quantity > 10) throw new RuntimeException('Invalid cart item.');
+            $bookQuery->execute([':slug' => $slug]);
+            $book = $bookQuery->fetch();
+            if (!$book || (int)$book['stock_quantity'] < $quantity) throw new RuntimeException('Book unavailable.');
+            $current[] = ['book'=>$book,'quantity'=>$quantity];
+        }
+
+        $currency = strtoupper((string)($current[0]['book']['currency'] ?? 'USD'));
+        $totalCents = 0;
+        foreach ($current as $entry) {
+            $entryCurrency = strtoupper((string)$entry['book']['currency']);
+            if ($entryCurrency !== $currency) throw new RuntimeException('Mixed currencies are not supported.');
+            $totalCents += (int)round(((float)$entry['book']['price']) * 100) * $entry['quantity'];
+        }
+
         $order = $pdo->prepare('INSERT INTO book_orders(customer_name,customer_email,notes,total_amount,currency,status) VALUES(:name,:email,:notes,:total,:currency,:status) RETURNING id');
         $order->execute([
             ':name' => $name,
             ':email' => $email,
             ':notes' => $notes !== '' ? $notes : null,
-            ':total' => number_format(cartTotal(), 2, '.', ''),
-            ':currency' => $items[0]['currency'] ?? 'USD',
+            ':total' => number_format($totalCents / 100, 2, '.', ''),
+            ':currency' => $currency,
             ':status' => 'inquiry',
         ]);
         $orderId = (int)$order->fetchColumn();
+
         $line = $pdo->prepare('INSERT INTO book_order_items(order_id,book_id,title,quantity,unit_price) VALUES(:order_id,:book_id,:title,:quantity,:unit_price)');
-        foreach ($items as $item) {
+        foreach ($current as $entry) {
+            $book = $entry['book'];
             $line->execute([
                 ':order_id' => $orderId,
-                ':book_id' => (int)$item['id'],
-                ':title' => $item['title'],
-                ':quantity' => (int)$item['quantity'],
-                ':unit_price' => number_format((float)$item['price'], 2, '.', ''),
+                ':book_id' => (int)$book['id'],
+                ':title' => $book['title'],
+                ':quantity' => $entry['quantity'],
+                ':unit_price' => number_format((float)$book['price'], 2, '.', ''),
             ]);
         }
         $pdo->commit();
         return true;
     } catch (Throwable $e) {
         if ($pdo instanceof PDO && $pdo->inTransaction()) $pdo->rollBack();
+        error_log('[book-order] '.get_class($e).': '.$e->getMessage());
         return false;
     }
 }
