@@ -3,7 +3,6 @@ declare(strict_types=1);
 require_once __DIR__.'/../config/bootstrap.php';
 
 $error = null;
-$throttled = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf($_POST['_csrf'] ?? null)) {
@@ -19,9 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $attempts = $pdo->prepare("SELECT COUNT(*) FROM admin_login_attempts WHERE identifier_hash = :hash AND attempted_at >= NOW() - INTERVAL '15 minutes'");
         $attempts->execute([':hash' => $identifierHash]);
-        $throttled = (int)$attempts->fetchColumn() >= 5;
 
-        if ($throttled) {
+        if ((int)$attempts->fetchColumn() >= 5) {
             $error = 'Too many sign-in attempts. Please wait 15 minutes and try again.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || $password === '') {
             $error = 'Invalid credentials.';
@@ -34,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $clear = $pdo->prepare('DELETE FROM admin_login_attempts WHERE identifier_hash = :hash');
                 $clear->execute([':hash' => $identifierHash]);
                 session_regenerate_id(true);
+                unset($_SESSION['_csrf']);
                 $_SESSION['admin_id'] = $admin['id'];
                 header('Location:/admin/');
                 exit;
