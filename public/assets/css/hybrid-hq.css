@@ -1,0 +1,14 @@
+/* Yurian Hybrid HQ layer: additive, accessible, and intentionally independent from the legacy visual system. */
+:root{--hq-accent:#d0a25b;--hq-panel:rgba(20,20,17,.82);--hq-border:rgba(240,237,229,.14);--hq-shadow:0 24px 80px rgba(0,0,0,.24)}
+.hq-presence{position:fixed;right:18px;bottom:18px;z-index:24;display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--hq-border);background:rgba(13,13,11,.76);backdrop-filter:blur(14px);box-shadow:var(--hq-shadow);font:9px 'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#aaa69c}
+.hq-presence__dot{width:7px;height:7px;border-radius:50%;background:var(--hq-accent);box-shadow:0 0 0 4px rgba(208,162,91,.11)}
+.hq-presence strong{color:#f0ede5;font-weight:500}
+.hq-progress{position:fixed;top:0;left:0;z-index:31;width:100%;height:2px;pointer-events:none;background:transparent}
+.hq-progress i{display:block;width:100%;height:100%;transform:scaleX(0);transform-origin:left;background:var(--hq-accent);transition:transform .08s linear}
+.hq-command-index{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px}
+.hq-command-index a{padding:10px 11px;border:1px solid var(--hq-border);color:#aaa69c;font:9px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;transition:.2s ease}
+.hq-command-index a:hover,.hq-command-index a:focus-visible{color:#f0ede5;border-color:rgba(208,162,91,.55);background:rgba(208,162,91,.07);outline:none}
+[data-hq-reveal]{opacity:0;transform:translateY(16px);transition:opacity .7s cubic-bezier(.23,1,.32,1),transform .7s cubic-bezier(.23,1,.32,1)}
+[data-hq-reveal].is-visible{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){[data-hq-reveal]{opacity:1;transform:none;transition:none}.hq-progress i{transition:none}}
+@media (max-width:700px){.hq-presence{right:12px;bottom:12px;font-size:8px}.hq-command-index{grid-template-columns:1fr 1fr}.hq-command-index a{padding:9px}}
