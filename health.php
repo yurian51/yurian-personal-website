@@ -7,7 +7,7 @@ $healthy = true;
 $dbStatus = 'unconfigured';
 
 try {
-    require_once __DIR__.'/config/bootstrap.php';
+    require_once __DIR__.'/config/database.php';
     db()->query('SELECT 1');
     $dbStatus = 'ok';
 } catch (Throwable $e) {
