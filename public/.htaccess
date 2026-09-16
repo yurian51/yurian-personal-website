@@ -12,6 +12,14 @@ Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 Header always set X-Permitted-Cross-Domain-Policies "none"
 Header always set Cross-Origin-Opener-Policy "same-origin"
 
-<FilesMatch "\.(css|js|jpg|jpeg|png|webp|svg|ico)$">
+# The service worker must be revalidated so a deployment can replace it promptly.
+<Files "sw.js">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+</Files>
+<Files "manifest.webmanifest">
+    Header set Cache-Control "public, max-age=3600"
+</Files>
+
+<FilesMatch "\.(css|js|jpg|jpeg|png|webp|svg|ico|woff|woff2)$">
     Header set Cache-Control "public, max-age=86400"
 </FilesMatch>
