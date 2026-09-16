@@ -1,0 +1,19 @@
+{
+  "name": "YURIAN // DIGITAL HQ",
+  "short_name": "YURIAN HQ",
+  "description": "Yurian's digital headquarters, project archive, field notes and reading room.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f1e8",
+  "theme_color": "#f5f1e8",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
