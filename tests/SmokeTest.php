@@ -41,6 +41,7 @@ assert(is_string($header) && str_contains($header, 'knowsAbout'), 'Person struct
 $serviceWorker = file_get_contents($root . '/public/sw.js');
 assert(is_string($serviceWorker) && str_contains($serviceWorker, "request.mode === 'navigate'"), 'Service worker must handle navigation requests.');
 assert(is_string($serviceWorker) && str_contains($serviceWorker, "caches.match('/offline.html')"), 'Service worker must provide an offline fallback.');
+assert(is_string($serviceWorker) && str_contains($serviceWorker, "Promise.allSettled(SHELL.map"), 'Service worker precache must tolerate partial shell outages.');
 assert(is_string($serviceWorker) && str_contains($serviceWorker, "const PRIVATE_PATHS = ['/api/', '/admin/', '/contact', '/checkout', '/cart'];"), 'Service worker must keep stateful and private routes outside the cache.');
 
 putenv('APP_URL=https://example.test');
