@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'yurian-hq-v2';
+const CACHE_VERSION = 'yurian-hq-v3';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -30,7 +30,12 @@ const isStaticAsset = (request) => /\.(?:css|js|svg|png|webp|jpg|jpeg|ico|woff2?
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(SHELL_CACHE)
-      .then((cache) => cache.addAll(SHELL))
+      .then(async (cache) => {
+        await Promise.allSettled(SHELL.map(async (url) => {
+          const response = await fetch(url, { cache: 'no-cache' });
+          if (response.ok) await cache.put(url, response);
+        }));
+      })
       .then(() => self.skipWaiting())
   );
 });
