@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'yurian-hq-v1';
+const CACHE_VERSION = 'yurian-hq-v2';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -9,7 +9,6 @@ const SHELL = [
   '/services',
   '/blog',
   '/books',
-  '/contact',
   '/offline.html',
   '/assets/css/app.css',
   '/assets/css/forms.css',
@@ -21,6 +20,12 @@ const SHELL = [
   '/assets/js/pwa.js',
   '/assets/icons/icon.svg'
 ];
+
+const PRIVATE_PATHS = ['/api/', '/admin/', '/contact', '/checkout', '/cart'];
+
+const isSameOrigin = (request) => new URL(request.url).origin === self.location.origin;
+const isPrivatePath = (pathname) => PRIVATE_PATHS.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+const isStaticAsset = (request) => /\.(?:css|js|svg|png|webp|jpg|jpeg|ico|woff2?)$/i.test(new URL(request.url).pathname);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -42,13 +47,10 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-const isSameOrigin = (request) => new URL(request.url).origin === self.location.origin;
-const isStaticAsset = (request) => /\.(?:css|js|svg|png|webp|jpg|jpeg|ico|woff2?)$/i.test(new URL(request.url).pathname);
-
 async function networkFirst(request) {
   try {
     const response = await fetch(request);
-    if (response.ok && isSameOrigin(request)) {
+    if (response.ok) {
       const cache = await caches.open(RUNTIME_CACHE);
       await cache.put(request, response.clone());
     }
@@ -63,10 +65,10 @@ async function staleWhileRevalidate(request) {
   const cached = await cache.match(request);
   const network = fetch(request)
     .then((response) => {
-      if (response.ok) cache.put(request, response.clone());
+      if (response.ok) return cache.put(request, response.clone()).then(() => response);
       return response;
     })
-    .catch(() => cached);
+    .catch(() => cached || Response.error());
 
   return cached || network;
 }
@@ -76,6 +78,7 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || !isSameOrigin(request)) return;
 
   const url = new URL(request.url);
+  if (isPrivatePath(url.pathname)) return;
 
   if (request.mode === 'navigate') {
     event.respondWith(networkFirst(request));
@@ -84,10 +87,5 @@ self.addEventListener('fetch', (event) => {
 
   if (isStaticAsset(request)) {
     event.respondWith(staleWhileRevalidate(request));
-    return;
-  }
-
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/admin/') || url.pathname.startsWith('/checkout') || url.pathname.startsWith('/cart')) {
-    return;
   }
 });
