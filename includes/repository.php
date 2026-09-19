@@ -179,3 +179,62 @@ function submitBookOrder(string $name, string $email, string $notes, array $item
         return false;
     }
 }
+
+
+function projectDossier(string $slug): ?array
+{
+    try {
+        $query = db()->prepare('SELECT p.*, d.problem, d.approach, d.architecture, d.status, d.outcomes, d.repository_url, d.live_url
+            FROM projects p LEFT JOIN project_details d ON d.project_id=p.id
+            WHERE p.slug=:slug AND p.published=TRUE LIMIT 1');
+        $query->execute([':slug'=>$slug]);
+        $project=$query->fetch();
+        if (!$project) return null;
+        $tech=$dbTech=[];
+        $t=db()->prepare('SELECT technology FROM project_technologies WHERE project_id=:id ORDER BY sort_order ASC,id ASC');
+        $t->execute([':id'=>(int)$project['id']]);
+        $project['technologies']=$t->fetchAll(PDO::FETCH_COLUMN);
+        return $project;
+    } catch (Throwable $e) {
+        $project=projectBySlug($slug);
+        if (!$project) return null;
+        $project['technologies']=[$project['category'] ?? 'Software'];
+        return $project;
+    }
+}
+
+function engineeringDomains(int $limit=20): array
+{
+    $limit=max(1,min($limit,100));
+    try {
+        $s=db()->prepare('SELECT * FROM engineering_domains WHERE published=TRUE ORDER BY sort_order ASC,id ASC LIMIT :limit');
+        $s->bindValue(':limit',$limit,PDO::PARAM_INT);$s->execute();return $s->fetchAll();
+    } catch(Throwable $e) { return []; }
+}
+
+function experienceItems(int $limit=20): array
+{
+    $limit=max(1,min($limit,100));
+    try {
+        $s=db()->prepare('SELECT * FROM experience WHERE published=TRUE ORDER BY current_role DESC,sort_order ASC,start_date DESC NULLS LAST LIMIT :limit');
+        $s->bindValue(':limit',$limit,PDO::PARAM_INT);$s->execute();return $s->fetchAll();
+    } catch(Throwable $e) { return []; }
+}
+
+function achievements(int $limit=20): array
+{
+    $limit=max(1,min($limit,100));
+    try {
+        $s=db()->prepare('SELECT * FROM achievements WHERE published=TRUE ORDER BY sort_order ASC,id ASC LIMIT :limit');
+        $s->bindValue(':limit',$limit,PDO::PARAM_INT);$s->execute();return $s->fetchAll();
+    } catch(Throwable $e) { return []; }
+}
+
+function buildThreads(int $limit=12): array
+{
+    $limit=max(1,min($limit,100));
+    try {
+        $s=db()->prepare('SELECT * FROM build_threads WHERE published=TRUE ORDER BY sort_order ASC,id ASC LIMIT :limit');
+        $s->bindValue(':limit',$limit,PDO::PARAM_INT);$s->execute();return $s->fetchAll();
+    } catch(Throwable $e) { return []; }
+}
