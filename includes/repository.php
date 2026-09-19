@@ -190,7 +190,6 @@ function projectDossier(string $slug): ?array
         $query->execute([':slug'=>$slug]);
         $project=$query->fetch();
         if (!$project) return null;
-        $tech=$dbTech=[];
         $t=db()->prepare('SELECT technology FROM project_technologies WHERE project_id=:id ORDER BY sort_order ASC,id ASC');
         $t->execute([':id'=>(int)$project['id']]);
         $project['technologies']=$t->fetchAll(PDO::FETCH_COLUMN);
