@@ -7,7 +7,7 @@ $heroName = $displayProfile['name'] ?? 'Arshad Yurian Mwangi';
 <main id="main-content" data-scroll-state="ORIGIN">
   <section class="hq-hero" id="top" data-state="ORIGIN">
     <div class="hq-hero__copy">
-      <p class="eyebrow"><span class="signal-dot"></span> Nairobi / EAT · 2026</p>
+      <p class="eyebrow"><span class="signal-dot"></span> Tanzania / EAT · 2026</p>
       <h1>BUILDING<br><em>SYSTEMS</em><br>FOR WHAT<br><span>COMES NEXT.</span></h1>
       <p class="hero-intro"><?= e($displayProfile['intro'] ?? 'Software engineer, AI builder, technology entrepreneur, and creator making useful things for an uncertain future.') ?></p>
       <div class="hero-actions">
@@ -29,7 +29,7 @@ $heroName = $displayProfile['name'] ?? 'Arshad Yurian Mwangi';
     <div class="section-label"><span>01</span><span>Identity</span></div>
     <div class="identity-grid">
       <p class="display-kicker">Not a portfolio.<br><em>A point of view.</em></p>
-      <div class="identity-copy"><p class="lede">I build at the intersection of <strong>engineering, intelligence, and culture.</strong> My work is an attempt to make technology feel less like a force acting on us — and more like a material we can shape together.</p><div class="identity-details"><div><span>ROLE</span><p>Engineer / Builder<br>Independent operator</p></div><div><span>BASED IN</span><p><?= e($displayProfile['location'] ?? 'Nairobi, Kenya') ?><br>Working globally</p></div><div><span>CURRENT MODE</span><p><i class="status-pulse"></i> Curious, in motion</p></div></div></div>
+      <div class="identity-copy"><p class="lede">I build at the intersection of <strong>engineering, intelligence, and culture.</strong> My work is an attempt to make technology feel less like a force acting on us — and more like a material we can shape together.</p><div class="identity-details"><div><span>ROLE</span><p>Engineer / Builder<br>Independent operator</p></div><div><span>BASED IN</span><p><?= e($displayProfile['location'] ?? 'Tanzania') ?><br>Working globally</p></div><div><span>CURRENT MODE</span><p><i class="status-pulse"></i> Curious, in motion</p></div></div></div>
     </div><div class="identity-rule"></div><div class="identity-bottom"><span>Software should expand human agency.</span><span>— a working principle</span></div>
   </section>
 
