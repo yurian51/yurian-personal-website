@@ -28,6 +28,7 @@ assert(is_file($root . '/database/migrations/004_bookstore.sql'), 'Bookstore mig
 assert(is_file($root . '/database/migrations/005_personal_platform.sql'), 'Personal platform migration must exist.');
 assert(is_file($root . '/database/migrations/006_seed_jaslyn_details.sql'), 'Jaslyn dossier correction migration must exist.');
 assert(is_file($root . '/database/migrations/007_seed_experience.sql'), 'Experience seed migration must exist.');
+assert(is_file($root . '/database/migrations/008_smart_inquiry.sql'), 'Smart inquiry migration must exist.');
 assert(is_file($root . '/views/engineering.php'), 'Engineering view must exist.');
 assert(is_file($root . '/views/case-studies.php'), 'Case study view must exist.');
 assert(is_file($root . '/views/cv.php'), 'Recruiter CV view must exist.');
