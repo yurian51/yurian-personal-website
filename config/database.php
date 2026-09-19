@@ -4,7 +4,9 @@ declare(strict_types=1);
 function db(): PDO
 {
     static $pdo = null;
+    static $unavailable = false;
     if ($pdo instanceof PDO) return $pdo;
+    if ($unavailable) throw new RuntimeException('Database configuration is missing.');
 
     $url = trim((string) getenv('DATABASE_URL'));
     if ($url !== '') {
@@ -31,6 +33,7 @@ function db(): PDO
     $user = getenv('DB_USER');
     $pass = getenv('DB_PASSWORD');
     if (!$host || !$name || !$user) {
+        $unavailable = true;
         error_log('[database] no runtime database environment variables available');
         throw new RuntimeException('Database configuration is missing.');
     }
