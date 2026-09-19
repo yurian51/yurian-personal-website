@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'yurian-hq-v3';
+const CACHE_VERSION = 'yurian-hq-v4';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -9,15 +9,21 @@ const SHELL = [
   '/services',
   '/blog',
   '/books',
+  '/engineering',
+  '/case-studies',
+  '/cv',
+  '/hire',
   '/offline.html',
   '/assets/css/app.css',
   '/assets/css/forms.css',
   '/assets/css/light-theme.css',
   '/assets/css/hybrid-hq.css',
   '/assets/css/realistic-editorial.css',
+  '/assets/css/personal-platform.css',
   '/assets/js/hq.js',
   '/assets/js/hybrid-hq.js',
   '/assets/js/pwa.js',
+  '/assets/js/personal-platform.js',
   '/assets/icons/icon.svg'
 ];
 
