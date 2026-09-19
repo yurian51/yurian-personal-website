@@ -59,6 +59,8 @@ assert(is_string($serviceWorker) && str_contains($serviceWorker, "request.mode =
 assert(is_string($serviceWorker) && str_contains($serviceWorker, "caches.match('/offline.html')"), 'Service worker must provide an offline fallback.');
 assert(is_string($serviceWorker) && str_contains($serviceWorker, "Promise.allSettled(SHELL.map"), 'Service worker precache must tolerate partial shell outages.');
 assert(is_string($serviceWorker) && str_contains($serviceWorker, "const PRIVATE_PATHS = ['/api/', '/admin/', '/contact', '/checkout', '/cart'];"), 'Service worker must keep stateful and private routes outside the cache.');
+$database = file_get_contents($root . '/config/database.php');
+assert(is_string($database) && str_contains($database, 'static $unavailable = false;'), 'Database adapter must cache missing configuration failures per request.');
 
 putenv('APP_URL=https://example.test');
 assert(url('/books') === 'https://example.test/books', 'Configured APP_URL must produce absolute URLs.');
