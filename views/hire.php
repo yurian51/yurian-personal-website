@@ -1,0 +1,6 @@
+<?php $services=services(12); ?>
+<main class="platform-page hire-page">
+  <section class="platform-hero"><div class="platform-kicker">BUSINESS / WORK WITH YURIAN</div><h1>Bring the hard problem.</h1><p>Software architecture, full-stack systems, AI workflows, business platforms, payment infrastructure and connectivity products built around the problem rather than a generic package.</p><a class="platform-button platform-button--dark" href="/contact">Start a project brief ↗</a></section>
+  <section class="platform-section"><div class="platform-section-head"><span>SERVICES</span><h2>What can be built.</h2></div><div class="service-grid"><?php foreach($services as $service): ?><article><span class="platform-index"><?=e(str_pad((string)($service['sort_order']??0),2,'0',STR_PAD_LEFT))?></span><h3><?=e($service['name'])?></h3><p><?=e($service['summary'])?></p></article><?php endforeach; ?></div></section>
+  <section class="platform-section inquiry-strip"><div><span class="platform-kicker">THE INTAKE</span><h2>Give the system enough context.</h2><p>The contact flow records the project stage, horizon and brief so the first response can start from the actual problem.</p></div><a class="platform-button" href="/contact">Open project intake ↗</a></section>
+</main>
