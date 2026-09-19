@@ -49,6 +49,19 @@ Checkout intentionally stops at an **order inquiry**. It stores the requested ti
 
 The bookstore schema and seed catalog live in `database/migrations/004_bookstore.sql` and are applied automatically by the migration runner.
 
+## Personal engineering platform
+
+The main site now includes structured personal-brand surfaces backed by PostgreSQL:
+
+- `/engineering` — engineering domains, live build threads, and structured proof.
+- `/case-studies` — project dossier index.
+- `/projects/{slug}` — technical dossier with problem, approach, architecture, outcomes, technologies, and source/live links when available.
+- `/cv` — recruiter-oriented engineering profile and experience.
+- `/hire` — business-facing services and project intake entry point.
+- `/contact` — smart project intake capturing company, service, budget, stage, timeline, and brief.
+
+Project dossiers, engineering domains, experience, achievements, and current build threads are stored in migrations `005_personal_platform.sql` through `008_smart_inquiry.sql`. The site does not invent telemetry or project metrics; structured proof is stored explicitly and can carry a source URL.
+
 ## Local development
 
 1. Copy `.env.example` to `.env`.
