@@ -189,17 +189,61 @@ function projectDossier(string $slug): ?array
             WHERE p.slug=:slug AND p.published=TRUE LIMIT 1');
         $query->execute([':slug'=>$slug]);
         $project=$query->fetch();
-        if (!$project) return null;
-        $t=db()->prepare('SELECT technology FROM project_technologies WHERE project_id=:id ORDER BY sort_order ASC,id ASC');
-        $t->execute([':id'=>(int)$project['id']]);
-        $project['technologies']=$t->fetchAll(PDO::FETCH_COLUMN);
-        return $project;
-    } catch (Throwable $e) {
-        $project=projectBySlug($slug);
-        if (!$project) return null;
-        $project['technologies']=[$project['category'] ?? 'Software'];
-        return $project;
-    }
+        if ($project) {
+            $t=db()->prepare('SELECT technology FROM project_technologies WHERE project_id=:id ORDER BY sort_order ASC,id ASC');
+            $t->execute([':id'=>(int)$project['id']]);
+            $project['technologies']=$t->fetchAll(PDO::FETCH_COLUMN);
+            return $project;
+        }
+    } catch (Throwable $e) {}
+
+    $fallback = [
+        'jaslyn-net'=>[
+            'name'=>'Jaslyn Net','slug'=>'jaslyn-net','category'=>'Network / ISP / FinTech',
+            'summary'=>'A universal connectivity operating fabric connecting payments, service entitlement, identity, network access, sessions, accounting, enforcement and reconciliation.',
+            'problem'=>'Build one traceable lifecycle from customer money through service entitlement and network access without duplicating billing, AAA, provisioning or enforcement concepts.',
+            'approach'=>'Converge payment, entitlement, identity, RADIUS/AAA, network control, session accounting and reconciliation around shared correlation identity and provider adapters.',
+            'architecture'=>'Hybrid connectivity platform with PostgreSQL, API services, Redis-oriented workflows, RADIUS/AAA integration and vendor-neutral network command boundaries.',
+            'status'=>'Active development',
+            'outcomes'=>'Production-oriented connectivity platform work focused on verified payment-to-access execution, provider-neutral network control and auditable lifecycle reconciliation.',
+            'repository_url'=>'https://github.com/yurian51/Jaslyn-Net','live_url'=>null,
+            'technologies'=>['Next.js','TypeScript','NestJS','PostgreSQL','Redis','RADIUS','MikroTik','Docker']
+        ],
+        'yurian-ai-os'=>[
+            'name'=>'YURIAN AI OS','slug'=>'yurian-ai-os','category'=>'AI / Software',
+            'summary'=>'An AI-native operating environment for knowledge, projects, documents, workflows and intelligent agents.',
+            'problem'=>'Keep project context, documents, workflows and intelligent tools connected instead of treating chat as the entire product.',
+            'approach'=>'Use explicit agent/tool boundaries, structured outputs and persistent project context with a provider abstraction layer.',
+            'architecture'=>'Web application with persistent project data, agent/tool execution boundaries and asynchronous workflows.',
+            'status'=>'Active development',
+            'outcomes'=>'Ongoing AI-native software, agent, context-management and automation engineering.',
+            'repository_url'=>'https://github.com/yurian51/Jaslyn','live_url'=>null,
+            'technologies'=>['TypeScript','Next.js','Node.js','PostgreSQL','AI Agents','Tool Calling']
+        ],
+        'sammena-primary-school'=>[
+            'name'=>'Sammena Primary School','slug'=>'sammena-primary-school','category'=>'Education / SIS',
+            'summary'=>'A school information and operations system covering admissions, students, academics, fees, reports and school workflows.',
+            'problem'=>'Turn recurring school administration into reliable digital workflows while preserving school-specific academic and operational rules.',
+            'approach'=>'Model identity, students, admissions, assessments, attendance, fees and reporting as explicit role-aware domains.',
+            'architecture'=>'Web application architecture with relational persistence, typed APIs, RBAC and school-scoped data boundaries.',
+            'status'=>'Active development',
+            'outcomes'=>'Production-oriented SIS work covering public school information and authenticated school operations.',
+            'repository_url'=>'https://github.com/yurian51/sammena-school-website','live_url'=>null,
+            'technologies'=>['Next.js','TypeScript','PostgreSQL','REST APIs','RBAC']
+        ],
+        'altavox-technologies'=>[
+            'name'=>'Altavox Technologies','slug'=>'altavox-technologies','category'=>'Technology',
+            'summary'=>'A technology brand and product ecosystem focused on digital business and software systems.',
+            'problem'=>'Create a coherent technology ecosystem that can host multiple digital products without turning them into unrelated systems.',
+            'approach'=>'Use a consistent product identity while keeping each product domain explicit and independently maintainable.',
+            'architecture'=>'Modular web product architecture with reusable UI, APIs, persistence and integration boundaries.',
+            'status'=>'Active development',
+            'outcomes'=>'Brand and product engineering across digital business systems, automation and intelligent workflows.',
+            'repository_url'=>null,'live_url'=>null,
+            'technologies'=>['Web Applications','APIs','PostgreSQL','Automation']
+        ]
+    ];
+    return $fallback[$slug] ?? null;
 }
 
 function engineeringDomains(int $limit=20): array
@@ -208,7 +252,15 @@ function engineeringDomains(int $limit=20): array
     try {
         $s=db()->prepare('SELECT * FROM engineering_domains WHERE published=TRUE ORDER BY sort_order ASC,id ASC LIMIT :limit');
         $s->bindValue(':limit',$limit,PDO::PARAM_INT);$s->execute();return $s->fetchAll();
-    } catch(Throwable $e) { return []; }
+    } catch(Throwable $e) { return [
+        ['name'=>'Software Architecture','summary'=>'Designing systems around explicit domains, boundaries, contracts and failure recovery.','technologies'=>'TypeScript · Node.js · NestJS · REST · GraphQL','sort_order'=>1],
+        ['name'=>'Full-Stack Engineering','summary'=>'Building production web applications from interface to persistence and deployment.','technologies'=>'Next.js · React · TypeScript · PHP · HTML · CSS','sort_order'=>2],
+        ['name'=>'Data & Backend Systems','summary'=>'Designing reliable APIs, relational models, transactions and background workflows.','technologies'=>'PostgreSQL · MySQL · Redis · Prisma · SQL','sort_order'=>3],
+        ['name'=>'Network & ISP Platforms','summary'=>'Connecting subscribers, identity, AAA, billing and network enforcement through provider-neutral boundaries.','technologies'=>'MikroTik · RADIUS · PPPoE · Hotspot · IPAM · QoS','sort_order'=>4],
+        ['name'=>'FinTech & Payments','summary'=>'Designing verifiable payment lifecycles with idempotency, reconciliation and auditability.','technologies'=>'M-Pesa · Payment APIs · Webhooks · Idempotency','sort_order'=>5],
+        ['name'=>'AI & Automation','summary'=>'Building agentic workflows with explicit tools, structured outputs and persistent context.','technologies'=>'AI Agents · Tool Calling · Automation · WebSockets','sort_order'=>6],
+        ['name'=>'Infrastructure & Delivery','summary'=>'Packaging, deploying and operating software with observable production boundaries.','technologies'=>'Linux · Docker · NGINX · Render · AWS · CI/CD','sort_order'=>7]
+    ]; }
 }
 
 function experienceItems(int $limit=20): array
@@ -217,7 +269,11 @@ function experienceItems(int $limit=20): array
     try {
         $s=db()->prepare('SELECT * FROM experience WHERE published=TRUE ORDER BY current_role DESC,sort_order ASC,start_date DESC NULLS LAST LIMIT :limit');
         $s->bindValue(':limit',$limit,PDO::PARAM_INT);$s->execute();return $s->fetchAll();
-    } catch(Throwable $e) { return []; }
+    } catch(Throwable $e) { return [
+        ['role'=>'Independent Software Engineer / Product Builder','organization'=>'Yurian','location'=>'Tanzania','start_date'=>'2024-01-01','current_role'=>true,'summary'=>'Designing and building production software across business systems, education platforms, connectivity infrastructure, AI workflows and digital products.','sort_order'=>1],
+        ['role'=>'Founder / Technology Builder','organization'=>'YURIAN TECH LTD','location'=>'Tanzania','start_date'=>'2024-01-01','current_role'=>true,'summary'=>'Building software products and technology services with emphasis on full-stack engineering, system architecture and practical delivery.','sort_order'=>2],
+        ['role'=>'Founder / Product Builder','organization'=>'Altavox Technologies','location'=>'Tanzania','start_date'=>'2025-01-01','current_role'=>true,'summary'=>'Developing technology products and digital business systems across automation, software platforms and intelligent workflows.','sort_order'=>3]
+    ]; }
 }
 
 function achievements(int $limit=20): array
@@ -226,7 +282,11 @@ function achievements(int $limit=20): array
     try {
         $s=db()->prepare('SELECT * FROM achievements WHERE published=TRUE ORDER BY sort_order ASC,id ASC LIMIT :limit');
         $s->bindValue(':limit',$limit,PDO::PARAM_INT);$s->execute();return $s->fetchAll();
-    } catch(Throwable $e) { return []; }
+    } catch(Throwable $e) { return [
+        ['name'=>'Jaslyn Net connectivity lifecycle','category'=>'Network / FinTech','status'=>'active','summary'=>'Payment-to-service-to-network lifecycle with shared correlation and verified enforcement.','progress'=>70,'project_slug'=>'jaslyn-net','sort_order'=>1],
+        ['name'=>'Yurian Personal Website','category'=>'Personal Platform','status'=>'active','summary'=>'Engineering portfolio, case-study library, recruiter surface and business interface.','progress'=>75,'project_slug'=>null,'sort_order'=>2],
+        ['name'=>'Yurian AI OS','category'=>'AI / Systems','status'=>'active','summary'=>'Persistent context, agent tools and AI-native workflows.','progress'=>45,'project_slug'=>'yurian-ai-os','sort_order'=>3]
+    ]; }
 }
 
 function buildThreads(int $limit=12): array
