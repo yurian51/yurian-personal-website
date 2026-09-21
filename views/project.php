@@ -3,23 +3,12 @@
 <?php else: ?>
 <main class="hq-section dossier-page">
   <div class="section-label"><span>PROJECT DOSSIER</span><span><?=e(strtoupper($project['category'] ?? 'BUILD'))?></span></div>
-  <p class="eyebrow"><span class="signal-dot"></span> <?=e($project['status'] ?? $project['category'] ?? 'Digital build')?></p>
+  <?php if(!empty($project['status'])): ?><p class="eyebrow"><span class="signal-dot"></span> <?=e($project['status'])?></p><?php endif; ?>
   <h1 class="dossier-title"><?=e($project['name'])?></h1>
-  <p class="dossier-lede"><?=e($project['summary'])?></p>
-  <div class="dossier-tech"><?php foreach(($project['technologies'] ?? []) as $technology): ?><span><?=e($technology)?></span><?php endforeach; ?></div>
-  <div class="dossier-detail-grid">
-    <article class="dossier-detail-card"><span class="mono-label">THE PROBLEM</span><h2>Why this exists.</h2><p><?=e($project['problem'] ?? 'The project is shaped around a concrete operational or product problem.')?></p></article>
-    <article class="dossier-detail-card"><span class="mono-label">APPROACH</span><h2>How it is being solved.</h2><p><?=e($project['approach'] ?? 'The implementation follows explicit system boundaries and production constraints.')?></p></article>
-    <article class="dossier-detail-card"><span class="mono-label">ARCHITECTURE</span><h2>How the pieces connect.</h2><p><?=e($project['architecture'] ?? 'Architecture details are maintained with the project as it evolves.')?></p></article>
-    <article class="dossier-detail-card"><span class="mono-label">OUTCOMES</span><h2>What has been made real.</h2><p><?=e($project['outcomes'] ?? 'Results are documented as the implementation is verified.')?></p></article>
-  </div>
-  <div class="dossier-rule"></div>
-  <div class="dossier-actions">
-    <a class="hq-text-link" href="/case-studies">← All case studies</a>
-    <div class="platform-actions">
-      <?php if(!empty($project['repository_url'])):?><a class="hq-text-link" href="<?=e($project['repository_url'])?>" target="_blank" rel="noopener noreferrer">Source / GitHub ↗</a><?php endif;?>
-      <?php $liveUrl=$project['live_url']??$project['url']??null; if($liveUrl):?><a class="hq-button hq-button--primary" href="<?=e($liveUrl)?>" target="_blank" rel="noopener noreferrer">Open live project ↗</a><?php endif;?>
-    </div>
-  </div>
+  <p class="dossier-lede"><?=e($project['summary'] ?? '')?></p>
+  <?php if(!empty($project['technologies'])): ?><div class="dossier-tech"><?php foreach($project['technologies'] as $technology): ?><span><?=e($technology)?></span><?php endforeach; ?></div><?php endif; ?>
+  <?php $sections=[['problem','THE PROBLEM','Why this exists.'],['approach','APPROACH','How it is being solved.'],['architecture','ARCHITECTURE','How the published system description fits together.'],['outcomes','OUTCOME RECORD','What the project record says has been made real.']]; $available=array_filter($sections,fn($section)=>!empty($project[$section[0]])); ?>
+  <?php if($available): ?><div class="dossier-detail-grid"><?php foreach($available as $section): ?><article class="dossier-detail-card"><span class="mono-label"><?=e($section[1])?></span><h2><?=e($section[2])?></h2><p><?=e($project[$section[0]])?></p></article><?php endforeach; ?></div><?php endif; ?>
+  <?php if(!empty($project['repository_url']) || !empty($project['live_url'])): ?><div class="dossier-rule"></div><div class="dossier-actions"><a class="hq-text-link" href="/case-studies">← All case studies</a><div class="platform-actions"><?php if(!empty($project['repository_url'])):?><a class="hq-text-link" href="<?=e($project['repository_url'])?>" target="_blank" rel="noopener noreferrer">Source / GitHub ↗</a><?php endif;?><?php if(!empty($project['live_url'])):?><a class="hq-button hq-button--primary" href="<?=e($project['live_url'])?>" target="_blank" rel="noopener noreferrer">Open live project ↗</a><?php endif;?></div></div><?php else: ?><div class="dossier-rule"></div><div class="dossier-actions"><a class="hq-text-link" href="/case-studies">← All case studies</a><span class="dossier-copy">No public repository or live URL is published for this project.</span></div><?php endif; ?>
 </main>
 <?php endif; ?>
